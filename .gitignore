@@ -1,0 +1,10 @@
+.DS_Store
+
+example.env
+package-lock.json
+
+/.vscode/settings.json
+
+/dist
+/coverage
+/node_modules
