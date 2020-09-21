@@ -22,7 +22,7 @@ export class Producer {
         const convertedMessages = this.__convertMessages(messages);
 
         await this.producer.send({
-            topic: topic || conf("KAFKA_PRODUCER_TOPIC", "confirmation"),
+            topic: topic || conf("KAFKA_PRODUCER_TOPIC", ""),
             acks: conf("KAFKA_PRODUCER_ACKS", 0),
             timeout: conf("KAFKA_PRODUCER_TIMEOUT", 30000),
             compression: this._convertCompressionTypes(conf("KAFKA_PRODUCER_COMPRESSION", null)),
