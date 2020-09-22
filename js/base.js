@@ -1,11 +1,14 @@
-import { load, conf } from "yonius";
-import { Kafka } from "kafkajs";
-import { Consumer } from "./consumer";
-import { Producer } from "./producer";
+import { conf, load } from "yonius";
+import { KafkaProducer } from "./kafkaProducer";
+import { KafkaConsumer } from "./kafkaConsumer";
+
+const adapters = {
+    KafkaProducer,
+    KafkaConsumer
+};
 
 export class API {
     constructor() {
-        this.kafkaClient = null;
         this.consumer = null;
         this.producer = null;
     }
@@ -14,34 +17,29 @@ export class API {
         await load();
     }
 
-    async build() {
-        const hosts = conf("KAFKA_HOSTS", "localhost:9092").split(" ");
-
-        this.kafkaClient = new Kafka({
-            brokers: hosts,
-            clientId: conf("KAFKA_CLIENT_ID", "ripe-communications"),
-            connectionTimeout: conf("KAFKA_CONNECT_TIMEOUT", 10000),
-            requestTimeout: conf("KAFKA_REQUEST_TIMEOUT", 30000),
-            retry: {
-                initialRetryTime: conf("KAFKA_INITIAL_RETRY_TIME", 300),
-                maxRetryTime: conf("KAFKA_MAX_RETRY_TIME", 30000),
-                retries: conf("KAFKA_RETRIES", 5),
-                maxInFlightRequests: conf("KAFKA_MAX_INFLIGHT_REQUESTS", null)
-            }
-        });
-
-        this.consumer = new Consumer(this.kafkaClient);
-        this.producer = new Producer(this.kafkaClient);
-
-        await Promise.all([this.consumer.connect(), this.producer.connect()]);
+    get adapter() {
+        const busConf = conf("BUS", "kafka");
+        return busConf[0].toUpperCase() + busConf.slice(1);
     }
 
-    async runConsumer(messageProcessor, sendConfirmation = null, sendError = null) {
-        await this.consumer.run(messageProcessor, sendConfirmation, sendError);
+    async _buildProducer() {
+        this.producer = new adapters[this.adapter + "Producer"]();
+        await this.producer.connect();
     }
 
-    async sendMessages(messages, topic = null) {
-        await this.producer.run(messages, topic);
+    async _buildConsumer() {
+        this.consumer = new adapters[this.adapter + "Consumer"]();
+        await this.consumer.connect();
+    }
+
+    async trigger(topic, message) {
+        if (!this.producer) await this._buildProducer();
+        await this.producer.produce(topic, [message]);
+    }
+
+    async bind(topic, callback) {
+        if (!this.consumer) await this._buildConsumer();
+        await this.consumer.consume(topic, callback);
     }
 
     async destroy() {
