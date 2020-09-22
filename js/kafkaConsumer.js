@@ -34,6 +34,7 @@ export class KafkaConsumer extends Consumer {
 
         await this.consumer.subscribe(topic);
 
+        // if the consumer is already running, only subscribes to the topic
         if (this.running) return;
 
         // retries processing previously failed messages every second
@@ -75,6 +76,7 @@ export class KafkaConsumer extends Consumer {
 
                     await heartbeat();
 
+                    if (!options.autoConfirm) continue;
                     if (options.onSuccess) options.onSuccess(parsedMessage);
                 }
             }
@@ -122,10 +124,10 @@ export class KafkaConsumer extends Consumer {
                     this._updateBufferFile();
                     continue;
                 }
-                // send confirmation to a topic that the
-                // message as been processed, even if the
-                // processing failed
+
+                if (!options.autoConfirm) continue;
                 if (options.onSuccess) options.onSuccess(message);
+
                 this.retryBuffer.splice(i, 1);
                 this._updateBufferFile();
                 i--;
