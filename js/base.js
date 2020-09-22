@@ -17,21 +17,6 @@ export class API {
         await load();
     }
 
-    get adapter() {
-        const busConf = conf("BUS", "kafka");
-        return busConf[0].toUpperCase() + busConf.slice(1);
-    }
-
-    async _buildProducer() {
-        this.producer = new adapters[this.adapter + "Producer"]();
-        await this.producer.connect();
-    }
-
-    async _buildConsumer() {
-        this.consumer = new adapters[this.adapter + "Consumer"]();
-        await this.consumer.connect();
-    }
-
     async trigger(topic, message, options = {}) {
         if (!this.producer) await this._buildProducer();
         options = { autoConfirm: true, ...options };
@@ -47,6 +32,21 @@ export class API {
     async destroy() {
         if (this.consumer) await this.consumer.disconnect();
         if (this.producer) await this.producer.disconnect();
+    }
+
+    get adapter() {
+        const busConf = conf("BUS", "kafka");
+        return busConf[0].toUpperCase() + busConf.slice(1);
+    }
+
+    async _buildProducer() {
+        this.producer = new adapters[this.adapter + "Producer"]();
+        await this.producer.connect();
+    }
+
+    async _buildConsumer() {
+        this.consumer = new adapters[this.adapter + "Consumer"]();
+        await this.consumer.connect();
     }
 }
 

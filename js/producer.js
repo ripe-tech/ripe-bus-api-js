@@ -5,11 +5,11 @@ export class Producer {
         throw new NotImplementedError();
     }
 
-    async produce(topic, message, options = {}) {
+    async disconnect() {
         throw new NotImplementedError();
     }
 
-    async disconnect() {
+    async produce(topic, message, options = {}) {
         throw new NotImplementedError();
     }
 }

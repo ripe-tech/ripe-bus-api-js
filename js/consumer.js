@@ -5,11 +5,11 @@ export class Consumer {
         throw new NotImplementedError();
     }
 
-    async consume(topic, callback, options = {}) {
+    async disconnect() {
         throw new NotImplementedError();
     }
 
-    async disconnect() {
+    async consume(topic, callback, options = {}) {
         throw new NotImplementedError();
     }
 }
