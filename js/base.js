@@ -8,26 +8,31 @@ const adapters = {
 };
 
 export class API {
-    constructor() {
+    constructor(options = {}) {
         this.consumer = null;
         this.producer = null;
+
+        this.options = options;
     }
 
     static async load() {
         await load();
     }
 
-    async trigger(topic, options = {}) {
+    async trigger(topic, message, options = {}) {
+        options = { ...this.options, ...options };
         if (!this.producer) await this._buildProducer(options);
-        await this.producer.produce(topic, options);
+        await this.producer.produce(topic, message, options);
     }
 
     async bind(topic, options = {}) {
         let callback = null;
 
-        if (typeof options === "function") callback = options;
-        else if (typeof options === "object") {
-            options = { autoConfirm: true, run: true, ...options };
+        if (typeof options === "function") {
+            callback = options;
+            options = { autoConfirm: true, run: true, ...this.options };
+        } else if (typeof options === "object") {
+            options = { autoConfirm: true, run: true, ...this.options, ...options };
         }
 
         if (!this.consumer) await this._buildConsumer(options);
@@ -40,7 +45,8 @@ export class API {
     }
 
     get adapter() {
-        const busConf = conf("BUS", "kafka");
+        const busConf =
+            this.options.adapter === undefined ? conf("BUS", "kafka") : this.options.adapter;
         return busConf[0].toUpperCase() + busConf.slice(1);
     }
 
