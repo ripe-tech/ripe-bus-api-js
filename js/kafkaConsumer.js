@@ -67,6 +67,17 @@ export class KafkaConsumer extends Consumer {
         this.running = false;
     }
 
+    /**
+     * Subscribes the consumer to the given topic and
+     * starts consuming if the `run` flag is set.
+     * If the consumer was already running, it is stopped
+     * before the topic subscription, due to library limitations.
+     *
+     * @param {*} topic Topic to consume messages from.
+     * @param {*} options Object that includes the callback for
+     * the message processing, callbacks for other events and
+     * configuration variables.
+     */
     async consume(topic, { callback, ...options }) {
         // if the consumer is already running, stops it to
         // subscribe to another topic
@@ -83,6 +94,13 @@ export class KafkaConsumer extends Consumer {
         if (options.run) this._runConsumer(options);
     }
 
+    /**
+     * Starts the consumer with the given configuration and
+     * processes each message.
+     *
+     * @param {*} options Object that contains configuration
+     * variables and callback functions.
+     */
     async _runConsumer(options = {}) {
         const autoCommit = options.autoCommit === undefined ? this.autoCommit : options.autoCommit;
         const autoCommitInterval =
@@ -122,6 +140,17 @@ export class KafkaConsumer extends Consumer {
         });
     }
 
+    /**
+     * Calls the given callback for the topic and sends a
+     * message confirming that the event was processed. The
+     * `onSuccess` logic can be outsourced if a function
+     * was provided.
+     *
+     * @param {*} message Message consumed by the consumer.
+     * @param {*} topic Topic where the message was consumed.
+     * @param {*} options Object that contains configuration
+     * variables and callback methods.
+     */
     async _processMessage(message, topic, options) {
         const parsedMessage = JSON.parse(message.value.toString());
         await this.topicCallbacks[topic](parsedMessage);
@@ -131,6 +160,11 @@ export class KafkaConsumer extends Consumer {
         else if (options.autoConfirm) this._onSuccess(parsedMessage);
     }
 
+    /**
+     * Function called when a message is successfully processed.
+     *
+     * @param {*} message Message consumed by the consumer.
+     */
     _onSuccess(message) {
         const confirmation = {
             name: "success",
