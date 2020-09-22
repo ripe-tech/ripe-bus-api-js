@@ -155,7 +155,7 @@ export class KafkaConsumer extends Consumer {
 
     _onError(message) {
         const failure = {
-            name: "success",
+            name: "error",
             hostname: os.hostname(),
             datatype: "json",
             timestamp: new Date(),
@@ -165,18 +165,20 @@ export class KafkaConsumer extends Consumer {
     }
 
     _readFromBufferFile() {
-        if (!fs.existsSync("data")) {
-            fs.mkdirSync("data");
+        const dir = conf("KAFKA_CONSUMER_RETRY_PERSISTENCE_DIR", "data");
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
             return;
         }
 
-        if (!fs.existsSync("data/retry.json")) return;
-        const data = fs.readFileSync("data/retry.json", { encoding: "utf-8" });
+        if (!fs.existsSync(`${dir}/retry.json`)) return;
+        const data = fs.readFileSync(`${dir}/retry.json`, { encoding: "utf-8" });
         this.retryBuffer = JSON.parse(data);
     }
 
     _updateBufferFile() {
-        fs.writeFileSync("data/retry.json", JSON.stringify(this.retryBuffer), "utf-8");
+        const dir = conf("KAFKA_CONSUMER_RETRY_PERSISTENCE_DIR", "data");
+        fs.writeFileSync(`${dir}/retry.json`, JSON.stringify(this.retryBuffer), "utf-8");
     }
 }
 
