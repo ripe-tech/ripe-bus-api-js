@@ -59,12 +59,12 @@ export class KafkaConsumer extends Consumer {
                     if (!isRunning() || isStale()) break;
 
                     const parsedMessage = JSON.parse(message.value.toString());
-                    const result = await callback(parsedMessage);
-
-                    // if the message processing fails, the message is
-                    // added to a retry buffer that will retry in an
-                    // exponentially increasing delay
-                    if (result && result.err) {
+                    try {
+                        await callback(parsedMessage);
+                    } catch (err) {
+                        // if the message processing fails, the message is
+                        // added to a retry buffer that will retry in an
+                        // exponentially increasing delay
                         this.retryBuffer.push({
                             ...parsedMessage,
                             firstFailure: Date.now(),
