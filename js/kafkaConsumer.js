@@ -16,6 +16,7 @@ export class KafkaConsumer extends Consumer {
             maxBytes: conf("KAFKA_CONSUMER_FETCH_MAX_BYTES", 1024 * 1024),
             maxWaitTimeInMs: conf("KAFKA_CONSUMER_FETCH_MAX_WAIT", 100)
         });
+        this.topicCallbacks = {};
         this.retryBuffer = [];
         this.running = false;
 
@@ -32,17 +33,21 @@ export class KafkaConsumer extends Consumer {
     }
 
     async consume(topic, callback, options = {}) {
-        if (typeof topic === "string") topic = { topic: topic };
+        // if the consumer is already running, stops it to
+        // subscribe to another topic
+        if (this.running) await this.consumer.stop();
 
-        await this.consumer.subscribe(topic);
-
-        // if the consumer is already running, only subscribes to the topic
-        if (this.running) return;
+        await this.consumer.subscribe({ topic: topic });
+        this.topicCallbacks[topic] = callback;
 
         // retries processing previously failed messages every second
         setInterval(() => this._retry(callback, options), 1000);
-        this.running = true;
 
+        this.running = true;
+        this._runConsumer(options);
+    }
+
+    async _runConsumer(options = {}) {
         this.consumer.run({
             autoCommit: conf("KAFKA_CONSUMER_AUTO_COMMIT", true),
             autoCommitInterval: conf("KAFKA_CONSUMER_AUTO_COMMIT_INTERVAL", 5000),
@@ -60,7 +65,7 @@ export class KafkaConsumer extends Consumer {
 
                     const parsedMessage = JSON.parse(message.value.toString());
                     try {
-                        await callback(parsedMessage);
+                        await this.topicCallbacks[batch.topic](parsedMessage);
                     } catch (err) {
                         // if the message processing fails, the message is
                         // added to a retry buffer that will retry in an
@@ -69,6 +74,7 @@ export class KafkaConsumer extends Consumer {
                             ...parsedMessage,
                             firstFailure: Date.now(),
                             lastRetry: Date.now(),
+                            topic: batch.topic,
                             retries: conf("KAFKA_CONSUMER_MESSAGE_FAILURE_RETRIES", 5),
                             retryDelay: conf("KAFKA_CONSUMER_MESSAGE_FIRST_DELAY", 50)
                         });
@@ -116,7 +122,7 @@ export class KafkaConsumer extends Consumer {
             // buffer, if not increases the delay time exponentially
             if (message.lastRetry + message.retryDelay <= Date.now()) {
                 try {
-                    await callback(message);
+                    await this.topicCallbacks[message.topic](message);
                 } catch (err) {
                     // increases the delay time exponentially while
                     // decreasing the number of retries available
