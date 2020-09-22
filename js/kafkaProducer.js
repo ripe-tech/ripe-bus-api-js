@@ -42,6 +42,7 @@ export class KafkaProducer extends Producer {
 
     _convertMessages(messages) {
         const convertedMessages = [];
+        if (!(messages instanceof Array)) messages = [messages];
         for (const message of messages) {
             if (typeof message === "string") convertedMessages.push(message);
             else convertedMessages.push({ value: JSON.stringify(message) });
