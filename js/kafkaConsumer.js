@@ -102,6 +102,7 @@ export class KafkaConsumer extends Consumer {
                         conf("KAFKA_CONSUMER_MESSAGE_FAILURE_MAX_TIME", null))
             ) {
                 this.retryBuffer.splice(i, 1);
+                this._updateBufferFile();
                 i--;
 
                 if (!options.autoConfirm) continue;
