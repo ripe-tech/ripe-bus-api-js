@@ -1,10 +1,14 @@
 import { conf, load } from "yonius";
 import { KafkaProducer } from "./kafkaProducer";
 import { KafkaConsumer } from "./kafkaConsumer";
+import { KafkaRetryConsumer } from "./kafkaRetryConsumer";
+import { KafkaRetryProducer } from "./kafkaRetryProducer";
 
 const adapters = {
     KafkaProducer,
-    KafkaConsumer
+    KafkaConsumer,
+    KafkaRetryProducer,
+    KafkaRetryConsumer
 };
 
 export class API {

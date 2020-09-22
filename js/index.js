@@ -4,3 +4,4 @@ export * from "./producer";
 export * from "./kafkaClient";
 export * from "./kafkaConsumer";
 export * from "./kafkaProducer";
+export * from "./kafkaRetryConsumer";
