@@ -114,9 +114,9 @@ export class KafkaConsumer extends Consumer {
             // again, if it is successful removes the message from the
             // buffer, if not increases the delay time exponentially
             if (message.lastRetry + message.retryDelay <= Date.now()) {
-                const result = await callback(message);
-
-                if (result && result.err) {
+                try {
+                    await callback(message);
+                } catch (err) {
                     // increases the delay time exponentially while
                     // decreasing the number of retries available
                     const updatedMessage = {
