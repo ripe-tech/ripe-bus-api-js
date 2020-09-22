@@ -24,7 +24,7 @@ export class KafkaProducer extends Producer {
     }
 
     async produce(topic, messages, options = {}) {
-        const convertedMessages = this.__convertMessages(messages);
+        const convertedMessages = this._convertMessages(messages);
 
         await this.producer.send({
             topic: topic,

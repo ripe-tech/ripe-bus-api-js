@@ -1,7 +1,9 @@
+import * as os from "os";
 import * as fs from "fs";
 import { conf } from "yonius";
 import { Consumer } from "./consumer";
 import { KafkaClient } from "./kafkaClient";
+import { API } from "./base";
 
 export class KafkaConsumer extends Consumer {
     constructor() {
@@ -98,9 +100,12 @@ export class KafkaConsumer extends Consumer {
                     Date.now() - message.firstFailure >=
                         conf("KAFKA_CONSUMER_MESSAGE_FAILURE_MAX_TIME", null))
             ) {
-                if (options.onError) options.onError(message);
                 this.retryBuffer.splice(i, 1);
                 i--;
+
+                if (!options.autoConfirm) continue;
+                if (options.onError) options.onError(message);
+                else this._onError(message);
                 continue;
             }
 
@@ -125,14 +130,37 @@ export class KafkaConsumer extends Consumer {
                     continue;
                 }
 
-                if (!options.autoConfirm) continue;
-                if (options.onSuccess) options.onSuccess(message);
-
                 this.retryBuffer.splice(i, 1);
                 this._updateBufferFile();
                 i--;
+
+                if (!options.autoConfirm) continue;
+                if (options.onSuccess) options.onSuccess(message);
+                else this._onSuccess(message);
             }
         }
+    }
+
+    _onSuccess(message) {
+        const confirmation = {
+            name: "success",
+            hostname: os.hostname(),
+            datatype: "json",
+            timestamp: new Date(),
+            payload: message
+        };
+        new API().trigger("confirmation", confirmation);
+    }
+
+    _onError(message) {
+        const failure = {
+            name: "success",
+            hostname: os.hostname(),
+            datatype: "json",
+            timestamp: new Date(),
+            payload: message
+        };
+        new API().trigger("error", failure);
     }
 
     _readFromBufferFile() {
