@@ -1,23 +1,46 @@
 import { conf } from "yonius";
 import { Kafka } from "kafkajs";
 
-export const KafkaClient = (function() {
-    var client = null;
+export const KafkaClient = (function () {
+    let client = null;
     return {
-        getInstance: () => {
+        getInstance: (options = {}) => {
             if (client) return client;
 
-            const hosts = conf("KAFKA_HOSTS", "localhost:9092").split(" ");
+            const hosts =
+                options.hosts === undefined ? conf("KAFKA_HOSTS", "localhost:9092") : options.hosts;
+            const clientId =
+                options.clientId === undefined
+                    ? conf("KAFKA_CLIENT_ID", "ripe-kafka")
+                    : options.clientId;
+            const connectionTimeout =
+                options.connectionTimeout === undefined
+                    ? conf("KAFKA_CONNECT_TIMEOUT", 10000)
+                    : options.connectionTimeout;
+            const requestTimeout = options.requestTimeout
+                ? conf("KAFKA_REQUEST_TIMEOUT", 30000)
+                : options.requestTimeout;
+            const initialRetryTime = options.initialRetryTime
+                ? conf("KAFKA_INITIAL_RETRY_TIME", 300)
+                : options.initialRetryTime;
+            const maxRetryTime = options.maxRetryTime
+                ? conf("KAFKA_MAX_RETRY_TIME", 30000)
+                : options.maxRetryTime;
+            const retries = options.retries ? conf("KAFKA_RETRIES", 5) : options.retries;
+            const maxInFlightRequests = options.maxInFlightRequests
+                ? conf("KAFKA_MAX_INFLIGHT_REQUESTS", null)
+                : options.maxInFlightRequests;
+
             client = new Kafka({
-                brokers: hosts,
-                clientId: conf("KAFKA_CLIENT_ID", "ripe-kafka"),
-                connectionTimeout: conf("KAFKA_CONNECT_TIMEOUT", 10000),
-                requestTimeout: conf("KAFKA_REQUEST_TIMEOUT", 30000),
+                brokers: hosts.split(","),
+                clientId: clientId,
+                connectionTimeout: connectionTimeout,
+                requestTimeout: requestTimeout,
                 retry: {
-                    initialRetryTime: conf("KAFKA_INITIAL_RETRY_TIME", 300),
-                    maxRetryTime: conf("KAFKA_MAX_RETRY_TIME", 30000),
-                    retries: conf("KAFKA_RETRIES", 5),
-                    maxInFlightRequests: conf("KAFKA_MAX_INFLIGHT_REQUESTS", null)
+                    initialRetryTime: initialRetryTime,
+                    maxRetryTime: maxRetryTime,
+                    retries: retries,
+                    maxInFlightRequests: maxInFlightRequests
                 }
             });
 

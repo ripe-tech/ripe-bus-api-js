@@ -17,16 +17,21 @@ export class API {
         await load();
     }
 
-    async trigger(topic, message, options = {}) {
-        if (!this.producer) await this._buildProducer();
-        options = { autoConfirm: true, ...options };
-        await this.producer.produce(topic, message, options);
+    async trigger(topic, options = {}) {
+        if (!this.producer) await this._buildProducer(options);
+        await this.producer.produce(topic, options);
     }
 
-    async bind(topic, callback, options = {}) {
-        if (!this.consumer) await this._buildConsumer();
-        options = { autoConfirm: true, ...options };
-        await this.consumer.consume(topic, callback, options);
+    async bind(topic, options = {}) {
+        let callback = null;
+
+        if (typeof options === "function") callback = options;
+        else if (typeof options === "object") {
+            options = { autoConfirm: true, run: true, ...options };
+        }
+
+        if (!this.consumer) await this._buildConsumer(options);
+        await this.consumer.consume(topic, { callback, ...options });
     }
 
     async destroy() {
@@ -39,7 +44,7 @@ export class API {
         return busConf[0].toUpperCase() + busConf.slice(1);
     }
 
-    async _buildProducer() {
+    async _buildProducer(args) {
         this.producer = new adapters[this.adapter + "Producer"]();
         await this.producer.connect();
     }

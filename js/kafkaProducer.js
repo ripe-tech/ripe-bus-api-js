@@ -4,15 +4,37 @@ import { Producer } from "./producer";
 import { KafkaClient } from "./kafkaClient";
 
 export class KafkaProducer extends Producer {
-    constructor() {
+    constructor(options = {}) {
         super();
 
         const kafkaClient = KafkaClient.getInstance();
         this.producer = kafkaClient.producer({
-            metadataMaxAge: conf("KAFKA_PRODUCER_METADATA_MAX_AGE", 300000),
-            allowAutoTopicCreation: conf("KAFKA_PRODUCER_AUTO_TOPIC_CREATION", true),
-            transactionTimeout: conf("KAFKA_PRODUCER_TRANSITION_TIMEOUT", 60000)
+            metadataMaxAge:
+                options.producerMetadataMaxAge === undefined
+                    ? conf("KAFKA_PRODUCER_METADATA_MAX_AGE", 300000)
+                    : options.producerMetadataMaxAge,
+            allowAutoTopicCreation:
+                options.producerAutoTopicCreation === undefined
+                    ? conf("KAFKA_PRODUCER_AUTO_TOPIC_CREATION", true)
+                    : options.producerAutoTopicCreation,
+            transactionTimeout:
+                options.producerTransitionTimeout === undefined
+                    ? conf("KAFKA_PRODUCER_TRANSITION_TIMEOUT", 60000)
+                    : options.producerTransitionTimeout
         });
+
+        this.acks =
+            options.producerAcks === undefined
+                ? conf("KAFKA_PRODUCER_ACKS", 0)
+                : options.producerAcks;
+        this.timeout =
+            options.producerTimeout === undefined
+                ? conf("KAFKA_PRODUCER_TIMEOUT", 30000)
+                : options.producerTimeout;
+        this.compression =
+            options.producerCompression === undefined
+                ? conf("KAFKA_PRODUCER_COMPRESSION", null)
+                : options.producerCompression;
     }
 
     async connect() {
@@ -23,14 +45,16 @@ export class KafkaProducer extends Producer {
         await this.producer.disconnect();
     }
 
-    async produce(topic, messages, options = {}) {
-        const convertedMessages = this._convertMessages(messages);
+    async produce(topic, { message, ...options }) {
+        const convertedMessages = this._convertMessages(message);
 
         await this.producer.send({
             topic: topic,
-            acks: conf("KAFKA_PRODUCER_ACKS", 0),
-            timeout: conf("KAFKA_PRODUCER_TIMEOUT", 30000),
-            compression: this._convertCompressionTypes(conf("KAFKA_PRODUCER_COMPRESSION", null)),
+            acks: options.producerAcks ? this.acks : options.producerAcks,
+            timeout: options.producerTimeout ? this.timeout : options.producerTimeout,
+            compression: this._convertCompressionTypes(
+                options.producerCompression ? this.compression : options.producerCompression
+            ),
             messages: convertedMessages
         });
     }
