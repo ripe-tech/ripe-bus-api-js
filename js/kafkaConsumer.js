@@ -80,6 +80,7 @@ export class KafkaConsumer extends Consumer {
 
                     if (!options.autoConfirm) continue;
                     if (options.onSuccess) options.onSuccess(parsedMessage);
+                    else this._onSuccess(message);
                 }
             }
         });

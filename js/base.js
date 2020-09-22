@@ -34,11 +34,13 @@ export class API {
 
     async trigger(topic, message, options = {}) {
         if (!this.producer) await this._buildProducer();
+        options = { autoConfirm: true, ...options };
         await this.producer.produce(topic, [message], options);
     }
 
     async bind(topic, callback, options = {}) {
         if (!this.consumer) await this._buildConsumer();
+        options = { autoConfirm: true, ...options };
         await this.consumer.consume(topic, callback, options);
     }
 
