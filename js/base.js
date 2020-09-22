@@ -32,14 +32,14 @@ export class API {
         await this.consumer.connect();
     }
 
-    async trigger(topic, message) {
+    async trigger(topic, message, options = {}) {
         if (!this.producer) await this._buildProducer();
-        await this.producer.produce(topic, [message]);
+        await this.producer.produce(topic, [message], options);
     }
 
-    async bind(topic, callback) {
+    async bind(topic, callback, options = {}) {
         if (!this.consumer) await this._buildConsumer();
-        await this.consumer.consume(topic, callback);
+        await this.consumer.consume(topic, callback, options);
     }
 
     async destroy() {

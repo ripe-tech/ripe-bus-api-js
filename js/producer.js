@@ -5,7 +5,7 @@ export class Producer {
         throw new NotImplementedError();
     }
 
-    async produce(topic, message) {
+    async produce(topic, message, options = {}) {
         throw new NotImplementedError();
     }
 

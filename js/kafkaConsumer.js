@@ -29,15 +29,15 @@ export class KafkaConsumer extends Consumer {
         this.running = false;
     }
 
-    async consume(topic, callback) {
-        // if (typeof topic === "string") topic = { topic: topic };
+    async consume(topic, callback, options = {}) {
+        if (typeof topic === "string") topic = { topic: topic };
 
-        await this.consumer.subscribe({ topic: topic });
+        await this.consumer.subscribe(topic);
 
         if (this.running) return;
 
         // retries processing previously failed messages every second
-        setInterval(() => this._retry(callback), 1000);
+        setInterval(() => this._retry(callback, options), 1000);
         this.running = true;
 
         this.consumer.run({
@@ -75,13 +75,13 @@ export class KafkaConsumer extends Consumer {
 
                     await heartbeat();
 
-                    // if (sendConfirmation) await sendConfirmation(parsedMessage);
+                    if (options.onSuccess) options.onSuccess(parsedMessage);
                 }
             }
         });
     }
 
-    async _retry(messageProcessor) {
+    async _retry(callback, options = {}) {
         if (this.retryBuffer.length === 0) return;
 
         for (let i = 0; i < this.retryBuffer.length; i++) {
@@ -96,7 +96,7 @@ export class KafkaConsumer extends Consumer {
                     Date.now() - message.firstFailure >=
                         conf("KAFKA_CONSUMER_MESSAGE_FAILURE_MAX_TIME", null))
             ) {
-                // if (sendError) await sendError(message);
+                if (options.onError) options.onError(message);
                 this.retryBuffer.splice(i, 1);
                 i--;
                 continue;
@@ -106,7 +106,7 @@ export class KafkaConsumer extends Consumer {
             // again, if it is successful removes the message from the
             // buffer, if not increases the delay time exponentially
             if (message.lastRetry + message.retryDelay <= Date.now()) {
-                const result = await messageProcessor(message);
+                const result = await callback(message);
 
                 if (result && result.err) {
                     // increases the delay time exponentially while
@@ -125,7 +125,7 @@ export class KafkaConsumer extends Consumer {
                 // send confirmation to a topic that the
                 // message as been processed, even if the
                 // processing failed
-                // if (sendConfirmation) await sendConfirmation(message);
+                if (options.onSuccess) options.onSuccess(message);
                 this.retryBuffer.splice(i, 1);
                 this._updateBufferFile();
                 i--;

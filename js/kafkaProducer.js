@@ -23,7 +23,7 @@ export class KafkaProducer extends Producer {
         await this.producer.disconnect();
     }
 
-    async produce(topic, messages) {
+    async produce(topic, messages, options = {}) {
         const convertedMessages = this.__convertMessages(messages);
 
         await this.producer.send({
