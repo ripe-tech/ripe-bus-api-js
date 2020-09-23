@@ -1,6 +1,8 @@
 # RIPE Bus API for Javascript
 
-The Javascript API for the RIPE Bus.
+The Javascript API for the RIPE event bus.
+
+Should be able to provide an easy-to-use API to be used by microservices of the PERI family.
 
 ## Initialization
 
