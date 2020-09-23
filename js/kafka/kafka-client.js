@@ -1,7 +1,7 @@
 import { conf } from "yonius";
 import { Kafka, CompressionTypes } from "kafkajs";
 
-export const KafkaClient = (function () {
+export const KafkaClient = (function() {
     let client = null;
     return {
         getInstance: (options = {}) => {
@@ -50,7 +50,7 @@ export const KafkaClient = (function () {
     };
 })();
 
-export const convertCompressionTypes = function (compression) {
+export const convertCompressionTypes = function(compression) {
     switch (compression) {
         case "gzip":
             return CompressionTypes.GZIP;

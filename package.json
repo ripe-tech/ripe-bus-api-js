@@ -49,6 +49,7 @@
     },
     "dependencies": {
         "kafkajs": "^1.13.0",
+        "sinon": "^9.0.3",
         "yonius": "^0.4.2"
     },
     "devDependencies": {
