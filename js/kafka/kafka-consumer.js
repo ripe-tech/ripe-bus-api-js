@@ -1,8 +1,8 @@
 import * as os from "os";
 import { conf } from "yonius";
-import { Consumer } from "./consumer";
-import { KafkaClient } from "./kafkaClient";
-import { API } from "./base";
+import { KafkaClient } from "./kafka-client";
+import { API } from "../base";
+import { Consumer } from "../consumer";
 
 export class KafkaConsumer extends Consumer {
     constructor(owner, options = {}) {

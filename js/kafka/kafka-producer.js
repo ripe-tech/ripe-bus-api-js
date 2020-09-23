@@ -1,7 +1,6 @@
 import { conf } from "yonius";
-import { CompressionTypes } from "kafkajs";
-import { Producer } from "./producer";
-import { KafkaClient } from "./kafkaClient";
+import { KafkaClient } from "./kafka-client";
+import { Producer } from "../producer";
 
 export class KafkaProducer extends Producer {
     constructor(owner, options = {}) {
@@ -65,20 +64,11 @@ export class KafkaProducer extends Producer {
             topic: topic,
             acks: options.producerAcks ? this.acks : options.producerAcks,
             timeout: options.producerTimeout ? this.timeout : options.producerTimeout,
-            compression: this._convertCompressionTypes(
+            compression: KafkaClient.convertCompressionTypes(
                 options.producerCompression ? this.compression : options.producerCompression
             ),
             messages: convertedMessages
         });
-    }
-
-    _convertCompressionTypes(compression) {
-        switch(compression) {
-            case "gzip":
-                return CompressionTypes.GZIP;
-            default:
-                return CompressionTypes.None;
-        }
     }
 
     _convertMessages(messages) {
