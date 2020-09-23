@@ -1,7 +1,7 @@
 import { conf } from "yonius";
 import { Kafka } from "kafkajs";
 
-export const KafkaClient = (function () {
+export const KafkaClient = (function() {
     let client = null;
     return {
         getInstance: (options = {}) => {

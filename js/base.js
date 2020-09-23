@@ -23,12 +23,34 @@ export class API {
         await load();
     }
 
+    /**
+     * Builds a producer if it doesn't already have
+     * one and sends the message to the given topic.
+     *
+     * @param {String} topic Topic to send messages to.
+     * @param {Array | Object | String} message Message to be sent to a topic.
+     * @param {Object} options Object that includes configuration
+     * variables.
+     */
     async trigger(topic, message, options = {}) {
         options = { ...this.options, ...options };
         if (!this.producer) await this._buildProducer(options);
         await this.producer.produce(topic, message, options);
     }
 
+    /**
+     * Builds a consumer if it doesn't already have one
+     * and starts consuming messages from the given topic,
+     * binding the callback to any new messages from the
+     * topic. The options can be a function, that corresponds
+     * to the callback, or an object that contains the callback
+     * and other functions and variables.
+     *
+     * @param {String} topic Topic to consume messages from.
+     * @param {Function | Object} options Object that includes the callback for
+     * the message processing, callbacks for other events and
+     * configuration variables.
+     */
     async bind(topic, options = {}) {
         let callback = null;
 
@@ -54,7 +76,7 @@ export class API {
         return busConf[0].toUpperCase() + busConf.slice(1);
     }
 
-    async _buildProducer(args) {
+    async _buildProducer() {
         this.producer = new adapters[this.adapter + "Producer"]();
         await this.producer.connect();
     }

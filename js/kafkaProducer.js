@@ -5,24 +5,37 @@ import { KafkaClient } from "./kafkaClient";
 
 export class KafkaProducer extends Producer {
     constructor(options = {}) {
-        super();
+        super(options);
+        this._build(options);
 
-        const kafkaClient = KafkaClient.getInstance();
+        const kafkaClient = KafkaClient.getInstance(options);
         this.producer = kafkaClient.producer({
-            metadataMaxAge:
-                options.producerMetadataMaxAge === undefined
-                    ? conf("KAFKA_PRODUCER_METADATA_MAX_AGE", 300000)
-                    : options.producerMetadataMaxAge,
-            allowAutoTopicCreation:
-                options.producerAutoTopicCreation === undefined
-                    ? conf("KAFKA_PRODUCER_AUTO_TOPIC_CREATION", true)
-                    : options.producerAutoTopicCreation,
-            transactionTimeout:
-                options.producerTransitionTimeout === undefined
-                    ? conf("KAFKA_PRODUCER_TRANSITION_TIMEOUT", 60000)
-                    : options.producerTransitionTimeout
+            metadataMaxAge: this.metadataMaxAge,
+            allowAutoTopicCreation: this.allowAutoTopicCreation,
+            transactionTimeout: this.transactionTimeout
         });
+    }
 
+    /**
+     * Sets the variables used for the Kafka client and
+     * producer.
+     *
+     * @param {Object} options Object that includes callbacks
+     * and configuration variables.
+     */
+    async _build(options) {
+        this.metadataMaxAge =
+            options.producerMetadataMaxAge === undefined
+                ? conf("KAFKA_PRODUCER_METADATA_MAX_AGE", 300000)
+                : options.producerMetadataMaxAge;
+        this.allowAutoTopicCreation =
+            options.producerAutoTopicCreation === undefined
+                ? conf("KAFKA_PRODUCER_AUTO_TOPIC_CREATION", true)
+                : options.producerAutoTopicCreation;
+        this.transactionTimeout =
+            options.producerTransitionTimeout === undefined
+                ? conf("KAFKA_PRODUCER_TRANSITION_TIMEOUT", 60000)
+                : options.producerTransitionTimeout;
         this.acks =
             options.producerAcks === undefined
                 ? conf("KAFKA_PRODUCER_ACKS", 0)
@@ -45,6 +58,16 @@ export class KafkaProducer extends Producer {
         await this.producer.disconnect();
     }
 
+    /**
+     * Converts messages to an array of strings and sends
+     * it to a specified topic.
+     *
+     * @param {String} topic Topic to send messages to.
+     * @param {Array | Object | String} message Message or messages
+     * to be sent to a topic.
+     * @param {Object} options Object that includes configuration
+     * variables.
+     */
     async produce(topic, message, options = {}) {
         const convertedMessages = this._convertMessages(message);
 

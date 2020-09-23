@@ -6,7 +6,7 @@ import { API } from "./base";
 
 export class KafkaRetryConsumer extends KafkaConsumer {
     constructor(options = {}) {
-        super();
+        super(options);
 
         this.retries = conf("KAFKA_CONSUMER_MESSAGE_FAILURE_RETRIES", 5);
         this.retryDelay = conf("KAFKA_CONSUMER_MESSAGE_FIRST_DELAY", 50);
@@ -36,8 +36,8 @@ export class KafkaRetryConsumer extends KafkaConsumer {
      * Sets the retry interval, checking each second to see
      * if the processing of each message can be retried.
      *
-     * @param {*} topic Topic to consume messages from.
-     * @param {*} options Object that includes the callback for
+     * @param {String} topic Topic to consume messages from.
+     * @param {Object} options Object that includes the callback for
      * the message processing, callbacks for other events and
      * configuration variables.
      */
@@ -67,9 +67,9 @@ export class KafkaRetryConsumer extends KafkaConsumer {
      * was provided. If the processing fails, adds the message
      * to a retry buffer, to be retried later.
      *
-     * @param {*} message Message consumed by the consumer.
-     * @param {*} topic Topic where the message was consumed.
-     * @param {*} options Object that contains configuration
+     * @param {Object} message Message consumed by the consumer.
+     * @param {String} topic Topic where the message was consumed.
+     * @param {Object} options Object that contains configuration
      * variables and callback methods.
      */
     async _processMessage(message, topic, options) {
@@ -106,7 +106,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
      * the failure. This `onError` logic can be outsourced if a function
      * was provided.
      *
-     * @param {*} options Object that contains configuration
+     * @param {Object} options Object that contains configuration
      * variables and callback methods.
      */
     async _retry(options = {}) {
@@ -175,7 +175,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
     /**
      * Function called when a message fails to be processed.
      *
-     * @param {*} message Message consumed by the consumer.
+     * @param {Object} message Message consumed by the consumer.
      */
     _onError(message) {
         const failure = {
@@ -201,9 +201,13 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             return;
         }
 
-        if (!fs.existsSync(`${dir}/retry.json`)) return;
-        const data = await fs.promises.readFile(`${dir}/retry.json`, { encoding: "utf-8" });
-        this.retryBuffer = JSON.parse(data);
+        try {
+            // if the file exists, reads it and populates
+            // the retryBuffer, if not ignores and returns
+            const data = await fs.promises.readFile(`${dir}/retry.json`, { encoding: "utf-8" });
+            this.retryBuffer = JSON.parse(data);
+        } finally {
+        }
     }
 
     /**

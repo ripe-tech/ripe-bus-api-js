@@ -6,10 +6,10 @@ import { API } from "./base";
 
 export class KafkaConsumer extends Consumer {
     constructor(options = {}) {
-        super();
+        super(options);
         this._build(options);
 
-        const kafkaClient = KafkaClient.getInstance();
+        const kafkaClient = KafkaClient.getInstance(options);
         this.consumer = kafkaClient.consumer({
             groupId: this.groupId,
             minBytes: this.minBytes,
@@ -20,6 +20,13 @@ export class KafkaConsumer extends Consumer {
         this.running = false;
     }
 
+    /**
+     * Sets the variables used for the Kafka client and
+     * consumer.
+     *
+     * @param {Object} options Object that includes callbacks
+     * and configuration variables.
+     */
     async _build(options) {
         this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", "ripe-kafka-consumer");
         this.minBytes = conf("KAFKA_CONSUMER_FETCH_MIN_BYTES", 1);
@@ -73,8 +80,8 @@ export class KafkaConsumer extends Consumer {
      * If the consumer was already running, it is stopped
      * before the topic subscription, due to library limitations.
      *
-     * @param {*} topic Topic to consume messages from.
-     * @param {*} options Object that includes the callback for
+     * @param {String} topic Topic to consume messages from.
+     * @param {Object} options Object that includes the callback for
      * the message processing, callbacks for other events and
      * configuration variables.
      */
@@ -98,7 +105,7 @@ export class KafkaConsumer extends Consumer {
      * Starts the consumer with the given configuration and
      * processes each message.
      *
-     * @param {*} options Object that contains configuration
+     * @param {Object} options Object that contains configuration
      * variables and callback functions.
      */
     async _runConsumer(options = {}) {
@@ -146,9 +153,9 @@ export class KafkaConsumer extends Consumer {
      * `onSuccess` logic can be outsourced if a function
      * was provided.
      *
-     * @param {*} message Message consumed by the consumer.
-     * @param {*} topic Topic where the message was consumed.
-     * @param {*} options Object that contains configuration
+     * @param {Object} message Message consumed by the consumer.
+     * @param {String} topic Topic where the message was consumed.
+     * @param {Object} options Object that contains configuration
      * variables and callback methods.
      */
     async _processMessage(message, topic, options) {
@@ -163,7 +170,7 @@ export class KafkaConsumer extends Consumer {
     /**
      * Function called when a message is successfully processed.
      *
-     * @param {*} message Message consumed by the consumer.
+     * @param {Object} message Message consumed by the consumer.
      */
     _onSuccess(message) {
         const confirmation = {
