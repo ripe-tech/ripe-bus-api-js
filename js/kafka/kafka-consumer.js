@@ -1,7 +1,6 @@
 import * as os from "os";
 import { conf } from "yonius";
 import { KafkaClient } from "./kafka-client";
-import { API } from "../base";
 import { Consumer } from "../consumer";
 
 export class KafkaConsumer extends Consumer {
@@ -170,7 +169,7 @@ export class KafkaConsumer extends Consumer {
             timestamp: new Date(),
             payload: message
         };
-        new API().trigger("confirmation", confirmation);
+        this.owner.trigger("confirmation", confirmation);
     }
 }
 

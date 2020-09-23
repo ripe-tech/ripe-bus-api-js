@@ -12,7 +12,6 @@ export class API {
     constructor(options = {}) {
         this.consumer = null;
         this.producer = null;
-
         this.options = options;
     }
 

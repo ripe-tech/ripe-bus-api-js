@@ -2,7 +2,6 @@ import * as os from "os";
 import * as fs from "fs";
 import { conf } from "yonius";
 import { KafkaConsumer } from "./kafka-consumer";
-import { API } from "../base";
 
 export class KafkaRetryConsumer extends KafkaConsumer {
     constructor(owner, options = {}) {
@@ -185,7 +184,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             timestamp: new Date(),
             payload: message
         };
-        new API().trigger("error", failure);
+        this.owner.trigger("error", failure);
     }
 
     /**
