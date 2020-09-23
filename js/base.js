@@ -13,6 +13,9 @@ export class API {
         this.consumer = null;
         this.producer = null;
         this.options = options;
+
+        this.busAdapter = conf("BUS_ADAPTER", "kafka");
+        this.busAdapter = this.options.adapter === undefined ? this.busAdapter : this.options.adapter
     }
 
     static async load() {
@@ -67,9 +70,7 @@ export class API {
     }
 
     get adapter() {
-        const busConf =
-            this.options.adapter === undefined ? conf("BUS", "kafka") : this.options.adapter;
-        return busConf[0].toUpperCase() + busConf.slice(1);
+        return this.busAdapter[0].toUpperCase() + this.busAdapter.slice(1);
     }
 
     async _buildProducer() {
