@@ -15,7 +15,8 @@ export class API {
         this.options = options;
 
         this.busAdapter = conf("BUS_ADAPTER", "kafka");
-        this.busAdapter = this.options.adapter === undefined ? this.busAdapter : this.options.adapter
+        this.busAdapter =
+            this.options.adapter === undefined ? this.busAdapter : this.options.adapter;
     }
 
     static async load() {
