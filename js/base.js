@@ -28,7 +28,7 @@ export class API {
      * one and sends the message to the given topic.
      *
      * @param {String} topic Topic to send messages to.
-     * @param {Array | Object | String} message Message to be sent to a topic.
+     * @param {Array|Object|String} message Message to be sent to a topic.
      * @param {Object} options Object that includes configuration
      * variables.
      */
@@ -47,7 +47,7 @@ export class API {
      * and other functions and variables.
      *
      * @param {String} topic Topic to consume messages from.
-     * @param {Function | Object} options Object that includes the callback for
+     * @param {Function|Object} options Object that includes the callback for
      * the message processing, callbacks for other events and
      * configuration variables.
      */

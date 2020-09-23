@@ -29,7 +29,7 @@ export class KafkaProducer extends Producer {
      * it to a specified topic.
      *
      * @param {String} topic Topic to send messages to.
-     * @param {Array | Object | String} message Message or messages
+     * @param {Array|Object|String} message Message or messages
      * to be sent to a topic.
      * @param {Object} options Object that includes configuration
      * variables.
