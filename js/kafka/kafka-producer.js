@@ -1,5 +1,5 @@
 import { conf } from "yonius";
-import { KafkaClient } from "./kafka-client";
+import { KafkaClient, convertCompressionTypes } from "./kafka-client";
 import { Producer } from "../producer";
 
 export class KafkaProducer extends Producer {
@@ -66,7 +66,7 @@ export class KafkaProducer extends Producer {
             topic: topic,
             acks: options.producerAcks ? this.acks : options.producerAcks,
             timeout: options.producerTimeout ? this.timeout : options.producerTimeout,
-            compression: KafkaClient.convertCompressionTypes(
+            compression: convertCompressionTypes(
                 options.producerCompression ? this.compression : options.producerCompression
             ),
             messages: convertedMessages
