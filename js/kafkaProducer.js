@@ -16,6 +16,38 @@ export class KafkaProducer extends Producer {
         });
     }
 
+    async connect() {
+        await this.producer.connect();
+    }
+
+    async disconnect() {
+        await this.producer.disconnect();
+    }
+
+    /**
+     * Converts messages to an array of strings and sends
+     * it to a specified topic.
+     *
+     * @param {String} topic Topic to send messages to.
+     * @param {Array | Object | String} message Message or messages
+     * to be sent to a topic.
+     * @param {Object} options Object that includes configuration
+     * variables.
+     */
+    async produce(topic, message, options = {}) {
+        const convertedMessages = this._convertMessages(message);
+
+        await this.producer.send({
+            topic: topic,
+            acks: options.producerAcks ? this.acks : options.producerAcks,
+            timeout: options.producerTimeout ? this.timeout : options.producerTimeout,
+            compression: this._convertCompressionTypes(
+                options.producerCompression ? this.compression : options.producerCompression
+            ),
+            messages: convertedMessages
+        });
+    }
+
     /**
      * Sets the variables used for the Kafka client and
      * producer.
@@ -48,38 +80,6 @@ export class KafkaProducer extends Producer {
             options.producerCompression === undefined
                 ? conf("KAFKA_PRODUCER_COMPRESSION", null)
                 : options.producerCompression;
-    }
-
-    async connect() {
-        await this.producer.connect();
-    }
-
-    async disconnect() {
-        await this.producer.disconnect();
-    }
-
-    /**
-     * Converts messages to an array of strings and sends
-     * it to a specified topic.
-     *
-     * @param {String} topic Topic to send messages to.
-     * @param {Array | Object | String} message Message or messages
-     * to be sent to a topic.
-     * @param {Object} options Object that includes configuration
-     * variables.
-     */
-    async produce(topic, message, options = {}) {
-        const convertedMessages = this._convertMessages(message);
-
-        await this.producer.send({
-            topic: topic,
-            acks: options.producerAcks ? this.acks : options.producerAcks,
-            timeout: options.producerTimeout ? this.timeout : options.producerTimeout,
-            compression: this._convertCompressionTypes(
-                options.producerCompression ? this.compression : options.producerCompression
-            ),
-            messages: convertedMessages
-        });
     }
 
     _convertCompressionTypes(compression) {

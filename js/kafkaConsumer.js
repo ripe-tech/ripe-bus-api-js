@@ -20,6 +20,42 @@ export class KafkaConsumer extends Consumer {
         this.running = false;
     }
 
+    async connect() {
+        await this.consumer.connect();
+    }
+
+    async disconnect() {
+        await this.consumer.disconnect();
+        this.running = false;
+    }
+
+    /**
+     * Subscribes the consumer to the given topic and
+     * starts consuming if the `run` flag is set.
+     * If the consumer was already running, it is stopped
+     * before the topic subscription, due to library limitations.
+     *
+     * @param {String} topic Topic to consume messages from.
+     * @param {Object} options Object that includes the callback for
+     * the message processing, callbacks for other events and
+     * configuration variables.
+     */
+    async consume(topic, { callback, ...options }) {
+        // if the consumer is already running, stops it to
+        // subscribe to another topic
+        if (this.running) await this.consumer.stop();
+
+        await this.consumer.subscribe({ topic: topic });
+        this.topicCallbacks[topic] = callback;
+
+        this.running = true;
+
+        // run the consumer only if the flag is true, making it
+        // possible to subscribe to several topics first and
+        // then execute the consumer
+        if (options.run) this._runConsumer(options);
+    }
+
     /**
      * Sets the variables used for the Kafka client and
      * consumer.
@@ -63,42 +99,6 @@ export class KafkaConsumer extends Consumer {
             options.eachBatchAutoResolve === undefined
                 ? this.eachBatchAutoResolve
                 : options.eachBatchAutoResolve;
-    }
-
-    async connect() {
-        await this.consumer.connect();
-    }
-
-    async disconnect() {
-        await this.consumer.disconnect();
-        this.running = false;
-    }
-
-    /**
-     * Subscribes the consumer to the given topic and
-     * starts consuming if the `run` flag is set.
-     * If the consumer was already running, it is stopped
-     * before the topic subscription, due to library limitations.
-     *
-     * @param {String} topic Topic to consume messages from.
-     * @param {Object} options Object that includes the callback for
-     * the message processing, callbacks for other events and
-     * configuration variables.
-     */
-    async consume(topic, { callback, ...options }) {
-        // if the consumer is already running, stops it to
-        // subscribe to another topic
-        if (this.running) await this.consumer.stop();
-
-        await this.consumer.subscribe({ topic: topic });
-        this.topicCallbacks[topic] = callback;
-
-        this.running = true;
-
-        // run the consumer only if the flag is true, making it
-        // possible to subscribe to several topics first and
-        // then execute the consumer
-        if (options.run) this._runConsumer(options);
     }
 
     /**
