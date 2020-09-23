@@ -11,6 +11,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         this.retryDelay = conf("KAFKA_CONSUMER_MESSAGE_FIRST_DELAY", 50);
         this.messageFailureMaxTime = conf("KAFKA_CONSUMER_MESSAGE_FAILURE_MAX_TIME", null);
         this.messageDelayExponential = conf("KAFKA_CONSUMER_MESSAGE_DELAY_EXPONENTIAL", 2);
+        this.retryPersistenceDir = conf("KAFKA_CONSUMER_RETRY_PERSISTENCE_DIR", "data");
 
         this.retries = options.retries === undefined ? this.retries : options.retries;
         this.retryDelay = options.retryDelay === undefined ? this.retryDelay : options.retryDelay;
@@ -22,6 +23,10 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             options.messageDelayExponential === undefined
                 ? this.messageDelayExponential
                 : options.messageDelayExponential;
+        this.retryPersistenceDir =
+            options.retryPersistenceDir === undefined
+                ? this.retryPersistenceDir
+                : options.retryPersistenceDir;
 
         this.retryBuffer = [];
         this._readFromBufferFile();
@@ -192,18 +197,22 @@ export class KafkaRetryConsumer extends KafkaConsumer {
      * populates the buffer.
      */
     async _readFromBufferFile() {
-        const dir = conf("KAFKA_CONSUMER_RETRY_PERSISTENCE_DIR", "data");
         try {
-            await fs.promises.access(dir, fs.constants.R_OK | fs.constants.W_OK);
+            await fs.promises.access(
+                this.retryPersistenceDir,
+                fs.constants.R_OK | fs.constants.W_OK
+            );
         } catch (err) {
-            await fs.promises.mkdir(dir);
+            await fs.promises.mkdir(this.retryPersistenceDir);
             return;
         }
 
         try {
             // if the file exists, reads it and populates
             // the retryBuffer, if not ignores and returns
-            const data = await fs.promises.readFile(`${dir}/retry.json`, { encoding: "utf-8" });
+            const data = await fs.promises.readFile(`${this.retryPersistenceDir}/retry.json`, {
+                encoding: "utf-8"
+            });
             this.retryBuffer = JSON.parse(data);
         } finally {
         }
@@ -214,8 +223,11 @@ export class KafkaRetryConsumer extends KafkaConsumer {
      * retry buffer.
      */
     async _updateBufferFile() {
-        const dir = conf("KAFKA_CONSUMER_RETRY_PERSISTENCE_DIR", "data");
-        await fs.promises.writeFile(`${dir}/retry.json`, JSON.stringify(this.retryBuffer), "utf-8");
+        await fs.promises.writeFile(
+            `${this.retryPersistenceDir}/retry.json`,
+            JSON.stringify(this.retryBuffer),
+            "utf-8"
+        );
     }
 }
 
