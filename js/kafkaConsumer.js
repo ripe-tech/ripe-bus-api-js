@@ -5,9 +5,44 @@ import { KafkaClient } from "./kafkaClient";
 import { API } from "./base";
 
 export class KafkaConsumer extends Consumer {
-    constructor(options = {}) {
-        super(options);
-        this._build(options);
+    constructor(owner, options = {}) {
+        super(owner, options);
+
+        this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", "ripe-kafka-consumer");
+        this.minBytes = conf("KAFKA_CONSUMER_FETCH_MIN_BYTES", 1);
+        this.maxBytes = conf("KAFKA_CONSUMER_FETCH_MAX_BYTES", 1024 * 1024);
+        this.maxWaitTimeInMs = conf("KAFKA_CONSUMER_FETCH_MAX_WAIT", 100);
+        this.autoCommit = conf("KAFKA_CONSUMER_AUTO_COMMIT", true);
+        this.autoCommitInterval = conf("KAFKA_CONSUMER_AUTO_COMMIT_INTERVAL", 5000);
+        this.autoCommitThreshold = conf("KAFKA_CONSUMER_AUTO_COMMIT_THRESHOLD", 1);
+        this.partitionsConsumedConcurrently = conf(
+            "KAFKA_CONSUMER_PARTITIONS_CONSUMED_CONCURRENTLY",
+            1
+        );
+        this.eachBatchAutoResolve = conf("KAFKA_CONSUMER_BATCH_AUTO_RESOLVE", true);
+
+        this.groupId = options.groupId === undefined ? this.groupId : options.groupId;
+        this.minBytes = options.minBytes === undefined ? this.minBytes : options.minBytes;
+        this.maxBytes = options.maxBytes === undefined ? this.maxBytes : options.maxBytes;
+        this.maxWaitTimeInMs =
+            options.maxWaitTimeInMs === undefined ? this.maxWaitTimeInMs : options.maxWaitTimeInMs;
+        this.autoCommit = options.autoCommit === undefined ? this.autoCommit : options.autoCommit;
+        this.autoCommitInterval =
+            options.autoCommitInterval === undefined
+                ? this.autoCommitInterval
+                : options.autoCommitInterval;
+        this.autoCommitThreshold =
+            options.autoCommitThreshold === undefined
+                ? this.autoCommitThreshold
+                : options.autoCommitThreshold;
+        this.partitionsConsumedConcurrently =
+            options.partitionsConsumedConcurrently === undefined
+                ? this.partitionsConsumedConcurrently
+                : options.partitionsConsumedConcurrently;
+        this.eachBatchAutoResolve =
+            options.eachBatchAutoResolve === undefined
+                ? this.eachBatchAutoResolve
+                : options.eachBatchAutoResolve;
 
         const kafkaClient = KafkaClient.getInstance(options);
         this.consumer = kafkaClient.consumer({
@@ -54,51 +89,6 @@ export class KafkaConsumer extends Consumer {
         // possible to subscribe to several topics first and
         // then execute the consumer
         if (options.run) this._runConsumer(options);
-    }
-
-    /**
-     * Sets the variables used for the Kafka client and
-     * consumer.
-     *
-     * @param {Object} options Object that includes callbacks
-     * and configuration variables.
-     */
-    async _build(options) {
-        this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", "ripe-kafka-consumer");
-        this.minBytes = conf("KAFKA_CONSUMER_FETCH_MIN_BYTES", 1);
-        this.maxBytes = conf("KAFKA_CONSUMER_FETCH_MAX_BYTES", 1024 * 1024);
-        this.maxWaitTimeInMs = conf("KAFKA_CONSUMER_FETCH_MAX_WAIT", 100);
-        this.autoCommit = conf("KAFKA_CONSUMER_AUTO_COMMIT", true);
-        this.autoCommitInterval = conf("KAFKA_CONSUMER_AUTO_COMMIT_INTERVAL", 5000);
-        this.autoCommitThreshold = conf("KAFKA_CONSUMER_AUTO_COMMIT_THRESHOLD", 1);
-        this.partitionsConsumedConcurrently = conf(
-            "KAFKA_CONSUMER_PARTITIONS_CONSUMED_CONCURRENTLY",
-            1
-        );
-        this.eachBatchAutoResolve = conf("KAFKA_CONSUMER_BATCH_AUTO_RESOLVE", true);
-
-        this.groupId = options.groupId === undefined ? this.groupId : options.groupId;
-        this.minBytes = options.minBytes === undefined ? this.minBytes : options.minBytes;
-        this.maxBytes = options.maxBytes === undefined ? this.maxBytes : options.maxBytes;
-        this.maxWaitTimeInMs =
-            options.maxWaitTimeInMs === undefined ? this.maxWaitTimeInMs : options.maxWaitTimeInMs;
-        this.autoCommit = options.autoCommit === undefined ? this.autoCommit : options.autoCommit;
-        this.autoCommitInterval =
-            options.autoCommitInterval === undefined
-                ? this.autoCommitInterval
-                : options.autoCommitInterval;
-        this.autoCommitThreshold =
-            options.autoCommitThreshold === undefined
-                ? this.autoCommitThreshold
-                : options.autoCommitThreshold;
-        this.partitionsConsumedConcurrently =
-            options.partitionsConsumedConcurrently === undefined
-                ? this.partitionsConsumedConcurrently
-                : options.partitionsConsumedConcurrently;
-        this.eachBatchAutoResolve =
-            options.eachBatchAutoResolve === undefined
-                ? this.eachBatchAutoResolve
-                : options.eachBatchAutoResolve;
     }
 
     /**

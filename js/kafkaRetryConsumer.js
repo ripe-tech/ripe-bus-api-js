@@ -5,8 +5,8 @@ import { KafkaConsumer } from "./kafkaConsumer";
 import { API } from "./base";
 
 export class KafkaRetryConsumer extends KafkaConsumer {
-    constructor(options = {}) {
-        super(options);
+    constructor(owner, options = {}) {
+        super(owner, options);
 
         this.retries = conf("KAFKA_CONSUMER_MESSAGE_FAILURE_RETRIES", 5);
         this.retryDelay = conf("KAFKA_CONSUMER_MESSAGE_FIRST_DELAY", 50);

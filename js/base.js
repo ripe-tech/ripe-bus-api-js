@@ -77,12 +77,12 @@ export class API {
     }
 
     async _buildProducer() {
-        this.producer = new adapters[this.adapter + "Producer"]();
+        this.producer = new adapters[this.adapter + "Producer"](this);
         await this.producer.connect();
     }
 
     async _buildConsumer() {
-        this.consumer = new adapters[this.adapter + "Consumer"]();
+        this.consumer = new adapters[this.adapter + "Consumer"](this);
         await this.consumer.connect();
     }
 }

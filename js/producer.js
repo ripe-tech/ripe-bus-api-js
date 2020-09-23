@@ -1,6 +1,10 @@
 import { NotImplementedError } from "yonius";
 
 export class Producer {
+    constructor(owner, options = {}) {
+        this.owner = owner;
+    }
+
     async connect() {
         throw new NotImplementedError();
     }
