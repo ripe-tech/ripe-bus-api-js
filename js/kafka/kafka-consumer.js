@@ -82,8 +82,6 @@ export class KafkaConsumer extends Consumer {
         await this.consumer.subscribe({ topic: topic });
         this.topicCallbacks[topic] = callback;
 
-        this.running = true;
-
         // run the consumer only if the flag is true, making it
         // possible to subscribe to several topics first and
         // then execute the consumer
@@ -116,6 +114,7 @@ export class KafkaConsumer extends Consumer {
                 ? this.eachBatchAutoResolve
                 : options.eachBatchAutoResolve;
 
+        this.running = true;
         this.consumer.run({
             autoCommit: autoCommit,
             autoCommitInterval: autoCommitInterval,
