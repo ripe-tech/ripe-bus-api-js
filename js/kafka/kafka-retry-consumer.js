@@ -56,8 +56,6 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         // retries processing previously failed messages every second
         setInterval(() => this._retry(options), 1000);
 
-        this.running = true;
-
         // run the consumer only if the flag is true, making it
         // possible to subscribe to several topics first and
         // then execute the consumer
