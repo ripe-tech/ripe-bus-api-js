@@ -1,4 +1,4 @@
-# RIPE Bus API for Javascript
+# RIPE Bus API (for Javascript)
 
 The Javascript API for the RIPE event bus.
 
@@ -45,3 +45,14 @@ bus.bind("order", {
     retries: 5
 });
 ```
+
+## License
+
+RIPE Bus API (for Javascript) is currently licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/).
+
+## Build Automation
+
+[![Build Status](https://travis-ci.org/ripe-tech/ripe-bus-api-js.svg?branch=master)](https://travis-ci.org/ripe-tech/ripe-bus-api-js)
+[![Build Status GitHub](https://github.com/ripe-tech/ripe-bus-api-js/workflows/Main%20Workflow/badge.svg)](https://github.com/ripe-tech/ripe-bus-api-js/actions)
+[![npm Status](https://img.shields.io/npm/v/ripe-bus-api.svg)](https://www.npmjs.com/package/ripe-bus-api)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/)

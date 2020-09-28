@@ -1,5 +1,5 @@
 {
-    "name": "ripe-bus-api-js",
+    "name": "ripe-bus-api",
     "version": "0.1.0",
     "description": "The Ripe Bus API client",
     "keywords": [
