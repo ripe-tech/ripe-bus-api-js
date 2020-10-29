@@ -80,7 +80,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
 
         const parsedMessage = JSON.parse(message.value.toString());
         try {
-            await this.topicCallbacks[topic](parsedMessage);
+            await this.topicCallbacks[topic](parsedMessage, topic);
         } catch (err) {
             // if the message processing fails, the message is
             // added to a retry buffer that will retry in an

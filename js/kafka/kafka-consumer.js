@@ -148,7 +148,7 @@ export class KafkaConsumer extends Consumer {
      */
     async _processMessage(message, topic, options) {
         const parsedMessage = JSON.parse(message.value.toString());
-        await this.topicCallbacks[topic](parsedMessage);
+        await this.topicCallbacks[topic](parsedMessage, topic);
 
         if (!options.autoConfirm) return;
         if (options.onSuccess) options.onSuccess(parsedMessage);
