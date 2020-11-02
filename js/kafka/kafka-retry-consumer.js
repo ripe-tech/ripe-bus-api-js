@@ -112,9 +112,10 @@ export class KafkaRetryConsumer extends KafkaConsumer {
      * variables and callback methods.
      */
     async _retry(options = {}) {
-        if (this.retryBuffer.length === 0) return;
-
+        // iterates over the complete set of messages to be processed
+        // under the retry promise
         for (let i = 0; i < this.retryBuffer.length; i++) {
+            // gather the message to be processed in the current loop
             const message = this.retryBuffer[i];
 
             // if there are no retries left or the maximum time
@@ -139,38 +140,37 @@ export class KafkaRetryConsumer extends KafkaConsumer {
                 continue;
             }
 
-            // if the retry delay has passed, try processing the message
-            // again, if it is successful removes the message from the
-            // buffer, if not increases the delay time exponentially
-            if (message.lastRetry + message.retryDelay <= Date.now()) {
-                try {
-                    await this.topicCallbacks[message.topic](message);
-                } catch (err) {
-                    // increases the delay time exponentially while
-                    // decreasing the number of retries available
-                    const messageDelayExponential =
-                        options.messageDelayExponential === undefined
-                            ? this.messageDelayExponential
-                            : options.messageDelayExponential;
-                    const updatedMessage = {
-                        ...message,
-                        lastRetry: Date.now(),
-                        retries: message.retries - 1,
-                        retryDelay: message.retryDelay * messageDelayExponential
-                    };
-                    this.retryBuffer[i] = updatedMessage;
-                    await this._updateBufferFile();
-                    continue;
-                }
+            // in case the time for processing of the message has not been
+            // reached then continue the loop trying to find valid messages
+            if (Date.now() < message.lastRetry + message.retryDelay) continue;
 
-                this.retryBuffer.splice(i, 1);
+            try {
+                await this.topicCallbacks[message.topic](message);
+            } catch (err) {
+                // increases the delay time exponentially while
+                // decreasing the number of retries available
+                const messageDelayExponential =
+                    options.messageDelayExponential === undefined
+                        ? this.messageDelayExponential
+                        : options.messageDelayExponential;
+                const updatedMessage = {
+                    ...message,
+                    lastRetry: Date.now(),
+                    retries: message.retries - 1,
+                    retryDelay: message.retryDelay * messageDelayExponential
+                };
+                this.retryBuffer[i] = updatedMessage;
                 await this._updateBufferFile();
-                i--;
-
-                if (!options.autoConfirm) continue;
-                if (options.onSuccess) options.onSuccess(message);
-                else this._onSuccess(message);
+                continue;
             }
+
+            this.retryBuffer.splice(i, 1);
+            await this._updateBufferFile();
+            i--;
+
+            if (!options.autoConfirm) continue;
+            if (options.onSuccess) options.onSuccess(message);
+            else this._onSuccess(message);
         }
     }
 
@@ -180,14 +180,13 @@ export class KafkaRetryConsumer extends KafkaConsumer {
      * @param {Object} message Message consumed by the consumer.
      */
     _onError(message) {
-        const failure = {
+        this.owner.trigger("error", {
             name: "error",
             hostname: os.hostname(),
             datatype: "json",
             timestamp: new Date(),
             payload: message
-        };
-        this.owner.trigger("error", failure);
+        });
     }
 
     /**

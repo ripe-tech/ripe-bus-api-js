@@ -127,9 +127,13 @@ export class KafkaConsumer extends Consumer {
                     // as stale or if the consumer is not running
                     if (!isRunning() || isStale()) return;
 
-                    await this._processMessage(message, batch.topic, options);
-
-                    await heartbeat();
+                    try {
+                        await this._processMessage(message, batch.topic, options);
+                    } catch (err) {
+                        console.err(`Problem handling message ${message} (${err})`);
+                    } finally {
+                        await heartbeat();
+                    }
                 }
             }
         });
