@@ -1,6 +1,7 @@
 import babel from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import json from "@rollup/plugin-json";
 import nodePolyfills from "rollup-plugin-node-polyfills";
 import pkg from "./package.json";
 
@@ -33,6 +34,7 @@ export default [
             sourcemap: true
         },
         plugins: [
+            json(),
             yoniusRollup(),
             nodePolyfills(),
             resolve({
@@ -67,6 +69,7 @@ export default [
             }
         ],
         plugins: [
+            json(),
             resolve({
                 customResolveOptions: {
                     paths: nodePath
