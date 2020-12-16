@@ -46,7 +46,7 @@ bus.bind("order", {
 });
 ```
 
-## Environment Configuration Variables
+## Configuration
 
 For more details and up to date information on Kafka specific configs check the [Kafka official documentation](https://kafka.apache.org/documentation/#configuration).
 
