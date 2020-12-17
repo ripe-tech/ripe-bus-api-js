@@ -48,16 +48,16 @@ bus.bind("order", {
 
 ## Configuration
 
-For more details and up to date information on Kafka specific configs check the [Kafka official documentation](https://kafka.apache.org/documentation/#configuration).
+| Name                                     | Type  | Default               | Description                                              |
+| ---------------------------------------- | ----- | --------------------- | -------------------------------------------------------- |
+| **BUS_ADAPTER**                          | `str` | `kafka`               | RIPE Bus adapter (eg: `kafka`, `kafkaRetry`).            |
+| **KAFKA_HOSTS**                          | `str` | `localhost:9092`      | Kafka nodes available, separated by a `,` (comma).       |
+| **KAFKA_CLIENT_ID**                      | `str` | `ripe-kafka`          | Kafka client ID.                                         |
+| **KAFKA_CONSUMER_GROUP_ID**              | `str` | `ripe-kafka-consumer` | Kafka consumer ID.                                       |
+| **KAFKA_CONSUMER_RETRY_PERSISTENCE_DIR** | `str` | `data`                | Kafka consumer persistent directory for message retries. |
+| **KAFKA_RETRIES**                        | `int` | `5`                   | Kafka max number of retries.                             |
 
-| Name                                     | Type  | Mandatory | Default               | Description                                              |
-| ---------------------------------------- | ----- | --------- | --------------------- | -------------------------------------------------------- |
-| **BUS_ADAPTER**                          | `str` | false     | `kafka`               | RIPE Bus adapter (eg: `kafka`, `kafkaRetry`).            |
-| **KAFKA_HOSTS**                          | `str` | false     | `localhost:9092`      | Kafka nodes available, separated by a `,` (comma).       |
-| **KAFKA_CLIENT_ID**                      | `str` | false     | `ripe-kafka`          | Kafka client ID.                                         |
-| **KAFKA_CONSUMER_GROUP_ID**              | `str` | false     | `ripe-kafka-consumer` | Kafka consumer ID.                                       |
-| **KAFKA_CONSUMER_RETRY_PERSISTENCE_DIR** | `str` | false     | `data`                | Kafka consumer persistent directory for message retries. |
-| **KAFKA_RETRIES**                        | `int` | false     | `5`                   | Kafka max number of retries.                             |
+For more details and up-to-date information on Kafka specific configs check the [Kafka official documentation](https://kafka.apache.org/documentation/#configuration).
 
 ## License
 
