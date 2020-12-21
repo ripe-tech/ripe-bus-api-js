@@ -46,6 +46,19 @@ bus.bind("order", {
 });
 ```
 
+## Configuration
+
+| Name                                     | Type  | Default               | Description                                                                                                                                      |
+| ---------------------------------------- | ----- | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **BUS_ADAPTER**                          | `str` | `kafka`               | The name of the bus adapter adapter to be used (eg: `kafka`, `kafkaRetry`).                                                                      |
+| **KAFKA_HOSTS**                          | `str` | `localhost:9092`      | The hostname and port of the Kafka nodes to be used, separated by a `,` (comma).                                                                 |
+| **KAFKA_CLIENT_ID**                      | `str` | `ripe-kafka`          | Kafka client ID, uniquely identifies a connection to a Kafka broker (more [here](https://kafka.js.org/docs/1.13.0/configuration)).               |
+| **KAFKA_CONSUMER_GROUP_ID**              | `str` | `ripe-kafka-consumer` | Kafka consumer group ID, identifies a consumer and is unique for a given Kafka broker (more [here](https://kafka.js.org/docs/1.13.0/consuming)). |
+| **KAFKA_CONSUMER_RETRY_PERSISTENCE_DIR** | `str` | `data`                | Kafka consumer persistent directory that will store files for message retries.                                                                   |
+| **KAFKA_RETRIES**                        | `int` | `5`                   | Kafka max number of retries to be used in the sending of a message.                                                                              |
+
+For more details and up-to-date information on Kafka specific configs check the [Kafka official documentation](https://kafka.apache.org/documentation/#configuration).
+
 ## License
 
 RIPE Bus API (for Javascript) is currently licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/).
