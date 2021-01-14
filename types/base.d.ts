@@ -1,4 +1,4 @@
-import { Message } from "./producer";
+import { Message } from "./message";
 
 export declare class API {
     constructor(options?: Record<string, unknown>);
