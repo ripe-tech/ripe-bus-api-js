@@ -1,8 +1,9 @@
 import { Message } from "./message";
 
 export declare class API {
-    constructor(options?: Record<string, unknown>);
     static load(): Promise<void>;
+
+    constructor(options?: Record<string, unknown>);
     trigger(topic: string, message: Message, options?: Record<string, unknown>): Promise<void>;
     build(): Promise<void>
     runConsumer(messageProcessor: Function, sendConfirmation?: Function, sendError?: Function): Promise<object>;
