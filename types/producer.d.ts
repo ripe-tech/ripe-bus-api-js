@@ -1,4 +1,6 @@
-export interface Options {
+import { Message } from "./message";
+
+export interface ProduceOptions {
     readonly onSuccess?: Function,
     readonly onError?: Function
 }
@@ -7,5 +9,5 @@ export declare class Producer {
     constructor();
     connect(): Promise<void>;
     disconnect(): Promise<void>
-    produce(topic: string, messages: string | object | Array<string | object>, options?: Options): Promise<object>;
+    produce(topic: string, message: Message, options?: ProduceOptions): Promise<object>;
 }
