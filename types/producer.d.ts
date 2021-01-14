@@ -3,9 +3,11 @@ export interface ProduceOptions {
     readonly onError?: Function
 }
 
+export type Item = string | object;
+
 export declare class Producer {
     constructor();
     connect(): Promise<void>;
     disconnect(): Promise<void>
-    produce(topic: string, messages: string | object | Array<string | object>, options?: ProduceOptions): Promise<object>;
+    produce(topic: string, message: Item | Array<Item>, options?: ProduceOptions): Promise<object>;
 }
