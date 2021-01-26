@@ -1,6 +1,7 @@
-export type KafkaRetryBindOptions = {
-    callback?: ConsumerCallback,
+import { ConsumerCallback, BindOptions } from "../base";
+
+export type KafkaRetryBindOptions = BindOptions & {
     onSuccess?: ConsumerCallback,
     onError?: ConsumerCallback,
-    retries: number | undefined
-};
+    retries?: number
+}
