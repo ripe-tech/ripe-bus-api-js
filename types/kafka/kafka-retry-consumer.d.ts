@@ -5,3 +5,8 @@ export type KafkaRetryBindOptions = BindOptions & {
     onError?: ConsumerCallback,
     retries?: number
 }
+
+export declare class KafkaRetryConsumer {
+    constructor();
+    consume(topic: string, options: KafkaRetryBindOptions): Promise<void>;
+}
