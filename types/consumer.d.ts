@@ -7,5 +7,5 @@ export declare class Consumer {
     constructor();
     connect(): Promise<void>;
     disconnect(): Promise<void>
-    consume(topic: string, callback: Function, options?: ConsumeOptions): Promise<object>;
+    consume(topics: string | string[], callback: Function, options?: ConsumeOptions): Promise<object>;
 }

@@ -13,7 +13,7 @@ export class Consumer {
         throw new NotImplementedError();
     }
 
-    async consume(topic, callback, options = {}) {
+    async consume(topics, callback, options = {}) {
         throw new NotImplementedError();
     }
 }
