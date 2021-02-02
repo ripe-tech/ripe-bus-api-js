@@ -40,12 +40,14 @@ export class KafkaRetryConsumer extends KafkaConsumer {
      * Sets the retry interval, checking each second to see
      * if the processing of each message can be retried.
      *
-     * @param {Array | String} topics Topics to consume messages from.
+     * @param {Array|String} topics Topics to consume messages from.
      * @param {Object} options Object that includes the callback for
      * the message processing, callbacks for other events and
      * configuration variables.
      */
     async consume(topics, { callback, ...options }) {
+        // coerces a possible string value into an array so that
+        // the remaining logic becomes consistent
         topics = Array.isArray(topics) ? topics : [topics];
 
         // if the consumer is already running, stops it to

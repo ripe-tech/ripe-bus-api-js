@@ -69,12 +69,14 @@ export class KafkaConsumer extends Consumer {
      * If the consumer was already running, it is stopped
      * before the topic subscription, due to library limitations.
      *
-     * @param {Array | String} topics Topics to consume messages from.
+     * @param {Array|String} topics Topics to consume messages from.
      * @param {Object} options Object that includes the callback for
      * the message processing, callbacks for other events and
      * configuration variables.
      */
     async consume(topics, { callback, ...options }) {
+        // coerces a possible string value into an array so that
+        // the remaining logic becomes consistent
         topics = Array.isArray(topics) ? topics : [topics];
 
         // if the consumer is already running, stops it to
