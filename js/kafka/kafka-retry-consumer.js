@@ -84,7 +84,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
 
         const parsedMessage = JSON.parse(message.value.toString());
         try {
-            await this.topicCallbacks[topic](parsedMessage);
+            await this.topicCallbacks[topic](parsedMessage, topic);
         } catch (err) {
             // if the message processing fails, the message is
             // added to a retry buffer that will retry in an
@@ -102,8 +102,8 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         }
 
         if (!options.autoConfirm) return;
-        if (options.onSuccess) options.onSuccess(parsedMessage);
-        else if (options.autoConfirm) this._onSuccess(parsedMessage);
+        if (options.onSuccess) options.onSuccess(parsedMessage, topic);
+        else if (options.autoConfirm) this._onSuccess(parsedMessage, topic);
     }
 
     /**
