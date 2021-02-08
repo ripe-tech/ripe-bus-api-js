@@ -126,19 +126,24 @@ export class KafkaConsumer extends Consumer {
             partitionsConsumedConcurrently: partitionsConsumedConcurrently,
             eachBatchAutoResolve: eachBatchAutoResolve,
             eachBatch: async ({ batch, heartbeat, isRunning, isStale }) => {
-                for (const message of batch.messages) {
+                for (let message of batch.messages) {
                     // does not process message if message is marked
                     // as stale or if the consumer is not running
                     if (!isRunning() || isStale()) return;
 
                     try {
-                        const deserializedMessage = this._deserializeMessage(message);
+                        // deserialize the message from its serialized structure
+                        // so that it can be properly handled
+                        message = this._deserializeMessage(message);
 
                         // if this consumer is bound to a specific event
                         // name but this message doesn't match that, just
-                        // ignore it altogether
-                        if (name !== null && deserializedMessage.name !== name) return;
-                        await this._processMessage(deserializedMessage, batch.topic, options);
+                        // ignores it altogether
+                        if (name !== null && message.name !== name) return;
+
+                        // processes the message, notifying any listener about
+                        // its reception
+                        await this._processMessage(message, batch.topic, options);
                     } catch (err) {
                         console.error(`Problem handling message ${message} (${err})`);
                     } finally {
