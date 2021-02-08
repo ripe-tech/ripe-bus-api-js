@@ -1,9 +1,9 @@
-import { ConsumerCallback, BindOptions } from "../base";
+import { KafkaBindOptions } from "./kafka-consumer";
 
-export type KafkaRetryBindOptions = BindOptions & {
-    onSuccess?: ConsumerCallback,
-    onError?: ConsumerCallback,
+export type KafkaRetryBindOptions = KafkaBindOptions & {
     retries?: number
+    messageFailureMaxTime?: number,
+    messageDelayExponential?: number
 }
 
 export declare class KafkaRetryConsumer {

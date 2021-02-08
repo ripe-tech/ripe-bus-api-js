@@ -78,7 +78,7 @@ export class API {
 
         await this._ensureConsumer();
 
-        await this.consumer.consume(topic, { callback, ...options });
+        await this.consumer.consume(topic, { callback: callback, ...options });
     }
 
     async destroy() {

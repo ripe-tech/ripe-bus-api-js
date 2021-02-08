@@ -60,8 +60,6 @@ export class KafkaProducer extends Producer {
      * variables.
      */
     async produce(topic, message, options = {}) {
-        const convertedMessages = this._convertMessages(message);
-
         await this.producer.send({
             topic: topic,
             acks: options.producerAcks ? this.acks : options.producerAcks,
@@ -69,18 +67,14 @@ export class KafkaProducer extends Producer {
             compression: convertCompressionTypes(
                 options.producerCompression ? this.compression : options.producerCompression
             ),
-            messages: convertedMessages
+            messages: this._serializeMessage(message)
         });
     }
 
-    _convertMessages(messages) {
-        const convertedMessages = [];
-        if (!(messages instanceof Array)) messages = [messages];
-        for (const message of messages) {
-            if (typeof message === "string") convertedMessages.push(message);
-            else convertedMessages.push({ value: JSON.stringify(message) });
-        }
-        return convertedMessages;
+    _serializeMessage(messages) {
+        return (Array.isArray(messages) ? messages : [messages]).map(message => ({
+            value: JSON.stringify(message)
+        }));
     }
 }
 

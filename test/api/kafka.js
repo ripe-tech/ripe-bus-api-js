@@ -19,7 +19,7 @@ describe("Kafka", function() {
             const clientStub = sinon.stub(api.KafkaClient, "getInstance");
             clientStub.returns(fakeClient);
 
-            await bus.trigger("test-topic", "test-event", { text: "Test Message" });
+            await bus.trigger("test-topic.test-event", { text: "Test Message" });
 
             assert.strictEqual(connectSpy.called, true);
             assert.strictEqual(sendSpy.called, true);
