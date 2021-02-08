@@ -74,13 +74,13 @@ export class API {
         return this.busAdapter[0].toUpperCase() + this.busAdapter.slice(1);
     }
 
-    async _buildProducer() {
-        this.producer = new adapters[this.adapter + "Producer"](this);
+    async _buildProducer(options = {}) {
+        this.producer = new adapters[this.adapter + "Producer"](this, options);
         await this.producer.connect();
     }
 
-    async _buildConsumer() {
-        this.consumer = new adapters[this.adapter + "Consumer"](this);
+    async _buildConsumer(options = {}) {
+        this.consumer = new adapters[this.adapter + "Consumer"](this, options);
         await this.consumer.connect();
     }
 }
