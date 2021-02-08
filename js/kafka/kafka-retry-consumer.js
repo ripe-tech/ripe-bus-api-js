@@ -1,4 +1,3 @@
-import * as os from "os";
 import * as fs from "fs";
 import { conf } from "yonius";
 import { KafkaConsumer } from "./kafka-consumer";
@@ -45,7 +44,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
      * the message processing, callbacks for other events and
      * configuration variables.
      */
-    async consume(topics, { callback, ...options }) {
+    async consume(topics, options = {}) {
         // coerces a possible string value into an array so that
         // the remaining logic becomes consistent
         topics = Array.isArray(topics) ? topics : [topics];
@@ -55,7 +54,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         if (this.running) await this.consumer.stop();
 
         await Promise.all(topics.map(topic => this.consumer.subscribe({ topic: topic })));
-        topics.forEach(topic => (this.topicCallbacks[topic] = callback));
+        topics.forEach(topic => (this.topicCallbacks[topic] = options.callback));
 
         // retries processing previously failed messages every second
         setInterval(() => this._retry(options), 1000);
@@ -82,15 +81,14 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         const retries = options.retries === undefined ? this.retries : options.retries;
         const retryDelay = options.retryDelay === undefined ? this.retryDelay : options.retryDelay;
 
-        const parsedMessage = JSON.parse(message.value.toString());
         try {
-            await this.topicCallbacks[topic](parsedMessage, topic);
+            await this.topicCallbacks[topic](message, topic);
         } catch (err) {
             // if the message processing fails, the message is
             // added to a retry buffer that will retry in an
             // exponentially increasing delay
             this.retryBuffer.push({
-                ...parsedMessage,
+                ...message,
                 firstFailure: Date.now(),
                 lastRetry: Date.now(),
                 topic: topic,
@@ -102,8 +100,8 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         }
 
         if (!options.autoConfirm) return;
-        if (options.onSuccess) options.onSuccess(parsedMessage, topic);
-        else if (options.autoConfirm) this._onSuccess(parsedMessage, topic);
+        if (options.onSuccess) options.onSuccess(message, topic);
+        else if (options.autoConfirm) this._onSuccess(message, topic);
     }
 
     /**
@@ -140,7 +138,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
 
                 if (!options.autoConfirm) continue;
                 if (options.onError) options.onError(message);
-                else this._onError(message);
+                else this.owner.trigger("error", message);
                 continue;
             }
 
@@ -176,21 +174,6 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             if (options.onSuccess) options.onSuccess(message);
             else this._onSuccess(message);
         }
-    }
-
-    /**
-     * Function called when a message fails to be processed.
-     *
-     * @param {Object} message Message consumed by the consumer.
-     */
-    _onError(message) {
-        this.owner.trigger("error", {
-            name: "error",
-            hostname: os.hostname(),
-            datatype: "json",
-            timestamp: new Date(),
-            payload: message
-        });
     }
 
     /**

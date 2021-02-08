@@ -1,4 +1,3 @@
-import * as os from "os";
 import { conf } from "yonius";
 import { KafkaClient } from "./kafka-client";
 import { Consumer } from "../consumer";
@@ -74,7 +73,7 @@ export class KafkaConsumer extends Consumer {
      * the message processing, callbacks for other events and
      * configuration variables.
      */
-    async consume(topics, { callback, ...options }) {
+    async consume(topics, options = {}) {
         // coerces a possible string value into an array so that
         // the remaining logic becomes consistent
         topics = Array.isArray(topics) ? topics : [topics];
@@ -84,7 +83,7 @@ export class KafkaConsumer extends Consumer {
         if (this.running) await this.consumer.stop();
 
         await Promise.all(topics.map(topic => this.consumer.subscribe({ topic: topic })));
-        topics.forEach(topic => (this.topicCallbacks[topic] = callback));
+        topics.forEach(topic => (this.topicCallbacks[topic] = options.callback));
 
         // run the consumer only if the flag is true, making it
         // possible to subscribe to several topics first and
@@ -117,6 +116,7 @@ export class KafkaConsumer extends Consumer {
             options.eachBatchAutoResolve === undefined
                 ? this.eachBatchAutoResolve
                 : options.eachBatchAutoResolve;
+        const name = options.name === undefined ? null : options.name;
 
         this.running = true;
         this.consumer.run({
@@ -126,12 +126,23 @@ export class KafkaConsumer extends Consumer {
             partitionsConsumedConcurrently: partitionsConsumedConcurrently,
             eachBatchAutoResolve: eachBatchAutoResolve,
             eachBatch: async ({ batch, heartbeat, isRunning, isStale }) => {
-                for (const message of batch.messages) {
+                for (let message of batch.messages) {
                     // does not process message if message is marked
                     // as stale or if the consumer is not running
                     if (!isRunning() || isStale()) return;
 
                     try {
+                        // deserialize the message from its serialized structure
+                        // so that it can be properly handled
+                        message = this._deserializeMessage(message);
+
+                        // if this consumer is bound to a specific event
+                        // name but this message doesn't match that, just
+                        // ignores it altogether
+                        if (name !== null && message.name !== name) return;
+
+                        // processes the message, notifying any listener about
+                        // its reception
                         await this._processMessage(message, batch.topic, options);
                     } catch (err) {
                         console.error(`Problem handling message ${message} (${err})`);
@@ -155,28 +166,15 @@ export class KafkaConsumer extends Consumer {
      * variables and callback methods.
      */
     async _processMessage(message, topic, options) {
-        const parsedMessage = JSON.parse(message.value.toString());
-        await this.topicCallbacks[topic](parsedMessage, topic);
+        await this.topicCallbacks[topic](message, topic);
 
         if (!options.autoConfirm) return;
-        if (options.onSuccess) options.onSuccess(parsedMessage, topic);
-        else if (options.autoConfirm) this._onSuccess(parsedMessage, topic);
+        if (options.onSuccess) options.onSuccess(message, topic);
+        else if (options.autoConfirm) this.owner.trigger("confirmation.success", message);
     }
 
-    /**
-     * Function called when a message is successfully processed.
-     *
-     * @param {Object} message Message consumed by the consumer.
-     */
-    _onSuccess(message) {
-        const confirmation = {
-            name: "success",
-            hostname: os.hostname(),
-            datatype: "json",
-            timestamp: new Date(),
-            payload: message
-        };
-        this.owner.trigger("confirmation", confirmation);
+    _deserializeMessage(message) {
+        return JSON.parse(message.value.toString());
     }
 }
 
