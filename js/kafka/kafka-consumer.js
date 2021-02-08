@@ -131,8 +131,13 @@ export class KafkaConsumer extends Consumer {
                     // as stale or if the consumer is not running
                     if (!isRunning() || isStale()) return;
 
+                    // does not process message if the event name is
+                    // not of our interest
+                    const parsedMessage = JSON.parse(message.value.toString());
+                    if (!this.events.includes(parsedMessage.name)) return;
+
                     try {
-                        await this._processMessage(message, batch.topic, options);
+                        await this._processMessage(parsedMessage, batch.topic, options);
                     } catch (err) {
                         console.error(`Problem handling message ${message} (${err})`);
                     } finally {
@@ -155,12 +160,11 @@ export class KafkaConsumer extends Consumer {
      * variables and callback methods.
      */
     async _processMessage(message, topic, options) {
-        const parsedMessage = JSON.parse(message.value.toString());
-        await this.topicCallbacks[topic](parsedMessage, topic);
+        await this.topicCallbacks[topic](message, topic);
 
         if (!options.autoConfirm) return;
-        if (options.onSuccess) options.onSuccess(parsedMessage, topic);
-        else if (options.autoConfirm) this._onSuccess(parsedMessage, topic);
+        if (options.onSuccess) options.onSuccess(message, topic);
+        else if (options.autoConfirm) this._onSuccess(message, topic);
     }
 
     /**

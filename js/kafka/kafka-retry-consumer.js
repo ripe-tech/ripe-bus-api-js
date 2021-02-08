@@ -82,15 +82,14 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         const retries = options.retries === undefined ? this.retries : options.retries;
         const retryDelay = options.retryDelay === undefined ? this.retryDelay : options.retryDelay;
 
-        const parsedMessage = JSON.parse(message.value.toString());
         try {
-            await this.topicCallbacks[topic](parsedMessage, topic);
+            await this.topicCallbacks[topic](message, topic);
         } catch (err) {
             // if the message processing fails, the message is
             // added to a retry buffer that will retry in an
             // exponentially increasing delay
             this.retryBuffer.push({
-                ...parsedMessage,
+                ...message,
                 firstFailure: Date.now(),
                 lastRetry: Date.now(),
                 topic: topic,
@@ -102,8 +101,8 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         }
 
         if (!options.autoConfirm) return;
-        if (options.onSuccess) options.onSuccess(parsedMessage, topic);
-        else if (options.autoConfirm) this._onSuccess(parsedMessage, topic);
+        if (options.onSuccess) options.onSuccess(message, topic);
+        else if (options.autoConfirm) this._onSuccess(message, topic);
     }
 
     /**
