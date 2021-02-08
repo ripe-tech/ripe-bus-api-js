@@ -22,7 +22,7 @@ The producer can send one or more messages to a specific topic. The third parame
 ```javascript
 bus.trigger("order.created", { id: 1, ... });
 
-bus.trigger("order.created_multiple".created, [{ id: 1, ... }, { id: 2, ... }]);
+bus.trigger("order.created_multiple", [{ id: 1, ... }, { id: 2, ... }]);
 ```
 
 ### Consumer
