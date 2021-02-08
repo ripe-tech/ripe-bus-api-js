@@ -1,3 +1,4 @@
+import { hostname } from "os";
 import { conf, load } from "yonius";
 import { KafkaProducer, KafkaConsumer, KafkaRetryConsumer, KafkaRetryProducer } from "./kafka";
 
@@ -35,7 +36,17 @@ export class API {
     async trigger(topic, message, options = {}) {
         options = { ...this.options, ...options };
         if (!this.producer) await this._buildProducer(options);
-        await this.producer.produce(topic, message, options);
+
+        const event = {
+            hostname: hostname(),
+            datatype: "json",
+            timestamp: Date.now(),
+            payload: message
+        };
+        if (message.name) event.name = message.name;
+        if (message.origin) event.origin = message.origin;
+
+        await this.producer.produce(topic, event, options);
     }
 
     /**
