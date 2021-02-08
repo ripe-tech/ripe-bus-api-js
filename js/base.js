@@ -1,4 +1,4 @@
-import { hostname } from "os";
+import * as os from "os";
 import { conf, load } from "yonius";
 import { KafkaProducer, KafkaConsumer, KafkaRetryConsumer, KafkaRetryProducer } from "./kafka";
 
@@ -38,7 +38,7 @@ export class API {
         if (!this.producer) await this._buildProducer(options);
 
         const event = {
-            hostname: hostname(),
+            hostname: os.hostname(),
             datatype: "json",
             timestamp: Date.now(),
             payload: message
