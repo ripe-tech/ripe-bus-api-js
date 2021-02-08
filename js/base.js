@@ -29,21 +29,22 @@ export class API {
      * one and sends the message to the given topic.
      *
      * @param {String} topic Topic to send messages to.
+     * @param {String} name Event name.
      * @param {Array|Object|String} message Message to be sent to a topic.
      * @param {Object} options Object that includes configuration
      * variables.
      */
-    async trigger(topic, message, options = {}) {
+    async trigger(topic, name, message, options = {}) {
         options = { ...this.options, ...options };
         if (!this.producer) await this._buildProducer(options);
 
         const event = {
+            name: name,
             hostname: os.hostname(),
             datatype: "json",
             timestamp: Date.now(),
             payload: message
         };
-        if (message.name) event.name = message.name;
         if (message.origin) event.origin = message.origin;
 
         await this.producer.produce(topic, event, options);
