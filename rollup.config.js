@@ -70,6 +70,7 @@ export default [
         ],
         plugins: [
             json(),
+            nodePolyfills(),
             commonjs(),
             resolve({
                 customResolveOptions: {
