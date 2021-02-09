@@ -170,9 +170,9 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             await this._updateBufferFile();
             i--;
 
-            if (!options.autoConfirm) return;
+            if (!options.autoConfirm) continue;
             if (options.onSuccess) options.onSuccess(message);
-            else if (options.autoConfirm) this.owner.trigger("confirmation.success", message);
+            else this.owner.trigger("confirmation.success", message);
         }
     }
 
