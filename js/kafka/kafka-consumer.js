@@ -79,10 +79,11 @@ export class KafkaConsumer extends Consumer {
         topics = Array.isArray(topics) ? topics : [topics];
 
         // if the consumer is already running, stops it to
-        // subscribe to another topic
+        // subscribe to another topic (this is required by design)
         if (this.running) await this.consumer.stop();
 
-        await Promise.all(topics.map(topic => this.consumer.subscribe({ topic: topic })));
+        // subscribes to the complete set of required topics (async fashion)
+        await Promise.all(topics.map(async topic => await this.consumer.subscribe({ topic: topic })));
         topics.forEach(topic => (this.topicCallbacks[topic] = options.callback));
 
         // run the consumer only if the flag is true, making it
@@ -172,10 +173,7 @@ export class KafkaConsumer extends Consumer {
      */
     async _processMessage(message, topic, options) {
         await this.topicCallbacks[topic](message, topic);
-
-        if (!options.autoConfirm) return;
         if (options.onSuccess) options.onSuccess(message, topic);
-        else if (options.autoConfirm) this.owner.trigger("confirmation.success", message);
     }
 
     _deserializeMessage(message) {
