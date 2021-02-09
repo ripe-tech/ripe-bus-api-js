@@ -167,8 +167,19 @@ export class KafkaConsumer extends Consumer {
      */
     async _processMessage(message, topic, options) {
         await this.topicCallbacks[topic](message, topic);
+        if (options.autoConfirm) this._confirmMessage(message, topic, options);
+    }
 
-        if (!options.autoConfirm) return;
+    /**
+     * Confirms the message. Uses either the default confirmation behavior or a custom
+     * `onSuccess` callback.
+     *
+     * @param {Object} message Message consumed by the consumer.
+     * @param {String} topic Topic where the message was consumed.
+     * @param {Object} options Object that contains configuration
+     * variables and callback methods.
+     */
+    _confirmMessage(message, topic, options) {
         if (options.onSuccess) options.onSuccess(message, topic);
         else if (options.autoConfirm) this.owner.trigger("confirmation.success", message);
     }
