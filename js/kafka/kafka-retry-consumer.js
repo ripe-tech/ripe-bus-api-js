@@ -100,7 +100,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         }
 
         if (!options.autoConfirm) return;
-        this._confirmMessage(message, topic, options)
+        this._confirmMessage(message, topic, options);
     }
 
     /**
@@ -136,7 +136,8 @@ export class KafkaRetryConsumer extends KafkaConsumer {
                 i--;
 
                 if (!options.autoConfirm) continue;
-                this._confirmMessage(message, topic, options)
+                if (options.onError) options.onError(message);
+                else this.owner.trigger("error", message);
                 continue;
             }
 
@@ -169,7 +170,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             i--;
 
             if (!options.autoConfirm) continue;
-            this._confirmMessage(message, topic, options)
+            this._confirmMessage(message, undefined, options);
         }
     }
 

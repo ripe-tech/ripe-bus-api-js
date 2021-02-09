@@ -180,7 +180,7 @@ export class KafkaConsumer extends Consumer {
      * variables and callback methods.
      */
     _confirmMessage(message, topic, options) {
-        if (options.onSuccess) options.onSuccess(message, topic);
+        if (options.onSuccess && topic) options.onSuccess(message, topic);
         else if (options.autoConfirm) this.owner.trigger("confirmation.success", message);
     }
 
