@@ -1,5 +1,5 @@
 import * as os from "os";
-import { conf, load } from "yonius";
+import { conf, load, YoniusError } from "yonius";
 import { KafkaProducer, KafkaConsumer, KafkaRetryConsumer, KafkaRetryProducer } from "./kafka";
 
 const adapters = {
@@ -74,7 +74,14 @@ export class API {
             options = { autoConfirm: true, run: true, ...this.options };
         } else if (typeof options === "object") {
             options = { autoConfirm: true, run: true, ...this.options, ...options };
+        } else {
+            throw new YoniusError("Invalid options type");
         }
+
+        // updates the on success event handler defaulting to a standard
+        // auto confirm implementation in case no on success is defined
+        const onSuccessDefault = (message, topic) => options.autoConfirm && this.trigger("confirmation.success", message);
+        options.onSuccess = options.onSuccess === undefined ? onSuccessDefault : options.onSuccess;
 
         await this._ensureConsumer();
 

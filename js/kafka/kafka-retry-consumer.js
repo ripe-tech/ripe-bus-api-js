@@ -99,8 +99,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             return;
         }
 
-        if (!options.autoConfirm) return;
-        this._confirmMessage(message, topic, options);
+        if (options.onSuccess) options.onSuccess(message, topic);
     }
 
     /**
@@ -169,8 +168,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             await this._updateBufferFile();
             i--;
 
-            if (!options.autoConfirm) continue;
-            this._confirmMessage(message, undefined, options);
+            if (options.onSuccess) options.onSuccess(message, message.topic);
         }
     }
 
