@@ -1,6 +1,7 @@
 export interface ConsumeOptions {
-    readonly onSuccess?: Function,
-    readonly onError?: Function
+    events?: string | string[],
+    onSuccess?: Function,
+    onError?: Function
 }
 
 export declare class Consumer {
