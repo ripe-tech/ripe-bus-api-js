@@ -1,4 +1,4 @@
-import { ConsumerCallback, BindOptions } from "../base";
+import { BindOptions } from "../base";
 
 export type KafkaBindOptions = BindOptions & {
     autoCommit?: boolean,

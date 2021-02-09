@@ -1,9 +1,6 @@
 import { Message } from "./message";
 
-export interface ProduceOptions {
-    readonly onSuccess?: Function,
-    readonly onError?: Function
-}
+export interface ProduceOptions {}
 
 export declare class Producer {
     constructor();

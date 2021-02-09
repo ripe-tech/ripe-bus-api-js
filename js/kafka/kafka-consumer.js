@@ -116,7 +116,12 @@ export class KafkaConsumer extends Consumer {
             options.eachBatchAutoResolve === undefined
                 ? this.eachBatchAutoResolve
                 : options.eachBatchAutoResolve;
-        const name = options.name === undefined ? null : options.name;
+        const events =
+            options.events === undefined
+                ? null
+                : Array.isArray(options.events)
+                ? options.events
+                : [options.events];
 
         this.running = true;
         this.consumer.run({
@@ -136,10 +141,10 @@ export class KafkaConsumer extends Consumer {
                         // so that it can be properly handled
                         message = this._deserializeMessage(message);
 
-                        // if this consumer is bound to a specific event
-                        // name but this message doesn't match that, just
+                        // if this consumer is bound to specific events
+                        // but this message doesn't match that, just
                         // ignores it altogether
-                        if (name !== null && message.name !== name) return;
+                        if (events !== null && options.events.includes(message.name)) return;
 
                         // processes the message, notifying any listener about
                         // its reception

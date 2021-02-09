@@ -21,7 +21,7 @@ export type TriggerOptions = {
 }
 
 export type BindOptions = {
-    name?: string,
+    events?: string | string[],
     autoConfirm: boolean,
     run: boolean,
     callback?: ConsumerCallback,
@@ -37,6 +37,6 @@ export declare class API {
     bind(topic: string, options?: ConsumerCallback | BindOptions): Promise<void>
     build(): Promise<void>
     runConsumer(messageProcessor: Function, sendConfirmation?: Function, sendError?: Function): Promise<object>;
-    sendMessages(messages: Array<string | object>, topic?: string): Promise<object>;
+    sendMessages(messages: string[] | object[], topic?: string): Promise<object>;
     destroy(): Promise<void>
 }
