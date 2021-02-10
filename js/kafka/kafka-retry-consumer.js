@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import { conf } from "yonius";
 import { KafkaConsumer } from "./kafka-consumer";
+import { sanitizeTopicName } from "./utils";
 
 export class KafkaRetryConsumer extends KafkaConsumer {
     constructor(owner, options = {}) {
@@ -48,6 +49,10 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         // coerces a possible string value into an array so that
         // the remaining logic becomes consistent
         topics = Array.isArray(topics) ? topics : [topics];
+
+        // sanitizes topic names according to Kafka
+        // topic naming rules
+        topics = topics.map(topic => sanitizeTopicName(topic));
 
         // if the consumer is already running, stops it to
         // subscribe to another topic
