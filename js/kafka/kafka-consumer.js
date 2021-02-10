@@ -83,7 +83,9 @@ export class KafkaConsumer extends Consumer {
         if (this.running) await this.consumer.stop();
 
         // subscribes to the complete set of required topics (async fashion)
-        await Promise.all(topics.map(async topic => await this.consumer.subscribe({ topic: topic })));
+        await Promise.all(
+            topics.map(async topic => await this.consumer.subscribe({ topic: topic }))
+        );
         topics.forEach(topic => (this.topicCallbacks[topic] = options.callback));
 
         // run the consumer only if the flag is true, making it
@@ -145,7 +147,7 @@ export class KafkaConsumer extends Consumer {
                         // if this consumer is bound to specific events
                         // but this message doesn't match that, just
                         // ignores it altogether
-                        if (events !== null && options.events.includes(message.name)) return;
+                        if (events !== null && !options.events.includes(message.name)) return;
 
                         // processes the message, notifying any listener about
                         // its reception
