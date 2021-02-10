@@ -1,5 +1,6 @@
 const assert = require("assert");
 const sinon = require("sinon");
+
 const api = require("../..");
 
 describe("Kafka", function() {
@@ -13,8 +14,11 @@ describe("Kafka", function() {
             };
             const connectSpy = sinon.spy(fakeProducer, "connect");
             const sendSpy = sinon.spy(fakeProducer, "send");
-            const fakeClient = {
+            const fakeKafkaClient = {
                 producer: () => fakeProducer
+            };
+            const fakeClient = {
+                client: fakeKafkaClient
             };
             const clientStub = sinon.stub(api.KafkaClient, "getInstance");
             clientStub.returns(fakeClient);
@@ -40,8 +44,11 @@ describe("Kafka", function() {
             const connectSpy = sinon.spy(fakeConsumer, "connect");
             const subscribeSpy = sinon.spy(fakeConsumer, "subscribe");
             const runSpy = sinon.spy(fakeConsumer, "run");
-            const fakeClient = {
+            const fakeKafkaClient = {
                 consumer: () => fakeConsumer
+            };
+            const fakeClient = {
+                client: fakeKafkaClient
             };
             const clientStub = sinon.stub(api.KafkaClient, "getInstance");
             clientStub.returns(fakeClient);

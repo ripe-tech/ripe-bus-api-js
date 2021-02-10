@@ -7,6 +7,10 @@ export class Client {
         return this._instance;
     }
 
+    static async build(options = {}) {
+        throw new NotImplementedError();
+    }
+
     get client() {
         throw new NotImplementedError();
     }

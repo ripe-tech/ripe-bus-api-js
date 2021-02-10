@@ -3,9 +3,13 @@ import { KafkaClient } from "./kafka-client";
 import { Consumer } from "../consumer";
 
 export class KafkaConsumer extends Consumer {
-    constructor(owner, options = {}) {
-        super(owner, options);
+    static async build(owner, options = {}) {
+        const instance = new this(owner, options);
+        await instance.init(options);
+        return instance;
+    }
 
+    async init(owner, options = {}) {
         this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", "ripe-kafka-consumer");
         this.minBytes = conf("KAFKA_CONSUMER_FETCH_MIN_BYTES", 1);
         this.maxBytes = conf("KAFKA_CONSUMER_FETCH_MAX_BYTES", 1024 * 1024);
@@ -42,7 +46,7 @@ export class KafkaConsumer extends Consumer {
                 ? this.eachBatchAutoResolve
                 : options.eachBatchAutoResolve;
 
-        const kafkaClient = KafkaClient.getInstance();
+        const kafkaClient = await KafkaClient.getInstance();
         this.consumer = kafkaClient.client.consumer({
             groupId: this.groupId,
             minBytes: this.minBytes,

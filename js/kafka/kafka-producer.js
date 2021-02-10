@@ -3,9 +3,13 @@ import { KafkaClient } from "./kafka-client";
 import { Producer } from "../producer";
 
 export class KafkaProducer extends Producer {
-    constructor(owner, options = {}) {
-        super(owner, options);
+    static async build(owner, options = {}) {
+        const instance = new this(owner, options);
+        await instance.init(options);
+        return instance;
+    }
 
+    async init(owner, options = {}) {
         this.metadataMaxAge = conf("KAFKA_PRODUCER_METADATA_MAX_AGE", 300000);
         this.allowAutoTopicCreation = conf("KAFKA_PRODUCER_AUTO_TOPIC_CREATION", true);
         this.transactionTimeout = conf("KAFKA_PRODUCER_TRANSITION_TIMEOUT", 60000);
@@ -33,7 +37,7 @@ export class KafkaProducer extends Producer {
                 ? this.compression
                 : options.producerCompression;
 
-        const kafkaClient = KafkaClient.getInstance(options);
+        const kafkaClient = await KafkaClient.getInstance(options);
         this.producer = kafkaClient.client.producer({
             metadataMaxAge: this.metadataMaxAge,
             allowAutoTopicCreation: this.allowAutoTopicCreation,
