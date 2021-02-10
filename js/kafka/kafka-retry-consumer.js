@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { conf } from "yonius";
-import { KafkaConsumer, sanitizeTopicName } from "./kafka-consumer";
-
+import { sanitizeTopicName } from "./kafka-client";
+import { KafkaConsumer } from "./kafka-consumer";
 export class KafkaRetryConsumer extends KafkaConsumer {
     constructor(owner, options = {}) {
         super(owner, options);
