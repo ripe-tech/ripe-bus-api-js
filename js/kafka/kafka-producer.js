@@ -1,6 +1,5 @@
 import { conf } from "yonius";
-import { KafkaClient, convertCompressionTypes } from "./kafka-client";
-import { sanitizeTopicName } from "./utils";
+import { KafkaClient, convertCompressionTypes, sanitizeTopicName } from "./kafka-client";
 import { Producer } from "../producer";
 
 export class KafkaProducer extends Producer {

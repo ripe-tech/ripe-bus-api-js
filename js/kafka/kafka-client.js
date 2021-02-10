@@ -50,6 +50,13 @@ export const KafkaClient = (function() {
     };
 })();
 
+/**
+ * Maps the string representation of a compression type to
+ * a KafkaJS compression type.
+ *
+ * @param compression Compression type string.
+ * @returns The KafkaJS compression type.
+ */
 export const convertCompressionTypes = function(compression) {
     switch (compression) {
         case "gzip":
@@ -57,4 +64,16 @@ export const convertCompressionTypes = function(compression) {
         default:
             return CompressionTypes.None;
     }
+};
+
+/**
+ * Sanitizes a topic name to match Kafka's topic naming
+ * rules.
+ *
+ * @param topic Topic name to be sanitized.
+ * @returns The sanitized topic name.
+ */
+export const sanitizeTopicName = function(topic) {
+    const illegalChars = /[^a-zA-Z0-9\\._\\-]/g;
+    return topic.replace(illegalChars, "_");
 };
