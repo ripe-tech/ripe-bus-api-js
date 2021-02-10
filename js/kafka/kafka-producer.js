@@ -1,5 +1,6 @@
 import { conf } from "yonius";
 import { KafkaClient, convertCompressionTypes } from "./kafka-client";
+import { sanitizeTopicName } from "./utils";
 import { Producer } from "../producer";
 
 export class KafkaProducer extends Producer {
@@ -61,7 +62,7 @@ export class KafkaProducer extends Producer {
      */
     async produce(topic, message, options = {}) {
         await this.producer.send({
-            topic: topic,
+            topic: sanitizeTopicName(topic),
             acks: options.producerAcks ? this.acks : options.producerAcks,
             timeout: options.producerTimeout ? this.timeout : options.producerTimeout,
             compression: convertCompressionTypes(

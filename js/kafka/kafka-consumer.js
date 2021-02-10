@@ -1,7 +1,7 @@
 import { conf } from "yonius";
 import { KafkaClient } from "./kafka-client";
+import { sanitizeTopicName } from "./utils";
 import { Consumer } from "../consumer";
-
 export class KafkaConsumer extends Consumer {
     constructor(owner, options = {}) {
         super(owner, options);
@@ -63,7 +63,7 @@ export class KafkaConsumer extends Consumer {
     }
 
     /**
-     * Subscribes the consumer to the given topic and
+     * Subscribes the consumer to the given topics and
      * starts consuming if the `run` flag is set.
      * If the consumer was already running, it is stopped
      * before the topic subscription, due to library limitations.
@@ -77,6 +77,10 @@ export class KafkaConsumer extends Consumer {
         // coerces a possible string value into an array so that
         // the remaining logic becomes consistent
         topics = Array.isArray(topics) ? topics : [topics];
+
+        // sanitizes topic names according to Kafka
+        // topic naming rules
+        topics = topics.map(topic => sanitizeTopicName(topic));
 
         // if the consumer is already running, stops it to
         // subscribe to another topic (this is required by design)

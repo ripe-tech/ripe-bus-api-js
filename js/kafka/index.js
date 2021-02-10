@@ -3,3 +3,4 @@ export * from "./kafka-consumer";
 export * from "./kafka-producer";
 export * from "./kafka-retry-consumer";
 export * from "./kafka-retry-producer";
+export * from "./utils";
