@@ -1,5 +1,5 @@
 import { conf } from "yonius";
-import { KafkaClient, convertCompressionTypes, sanitizeTopicName } from "./kafka-client";
+import { KafkaClient } from "./kafka-client";
 import { Producer } from "../producer";
 
 export class KafkaProducer extends Producer {
@@ -34,7 +34,7 @@ export class KafkaProducer extends Producer {
                 : options.producerCompression;
 
         const kafkaClient = KafkaClient.getInstance(options);
-        this.producer = kafkaClient.producer({
+        this.producer = kafkaClient.client.producer({
             metadataMaxAge: this.metadataMaxAge,
             allowAutoTopicCreation: this.allowAutoTopicCreation,
             transactionTimeout: this.transactionTimeout
@@ -61,10 +61,10 @@ export class KafkaProducer extends Producer {
      */
     async produce(topic, message, options = {}) {
         await this.producer.send({
-            topic: sanitizeTopicName(topic),
+            topic: KafkaClient.sanitizeTopic(topic),
             acks: options.producerAcks ? this.acks : options.producerAcks,
             timeout: options.producerTimeout ? this.timeout : options.producerTimeout,
-            compression: convertCompressionTypes(
+            compression: KafkaClient.convertCompression(
                 options.producerCompression ? this.compression : options.producerCompression
             ),
             messages: this._serializeMessage(message)

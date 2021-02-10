@@ -1,5 +1,5 @@
 import { conf } from "yonius";
-import { KafkaClient, sanitizeTopicName } from "./kafka-client";
+import { KafkaClient } from "./kafka-client";
 import { Consumer } from "../consumer";
 
 export class KafkaConsumer extends Consumer {
@@ -42,13 +42,14 @@ export class KafkaConsumer extends Consumer {
                 ? this.eachBatchAutoResolve
                 : options.eachBatchAutoResolve;
 
-        const kafkaClient = KafkaClient.getInstance(options);
-        this.consumer = kafkaClient.consumer({
+        const kafkaClient = KafkaClient.getInstance();
+        this.consumer = kafkaClient.client.consumer({
             groupId: this.groupId,
             minBytes: this.minBytes,
             maxBytes: this.maxBytes,
             maxWaitTimeInMs: this.maxWaitTimeInMs
         });
+
         this.topicCallbacks = {};
         this.running = false;
     }
@@ -63,8 +64,8 @@ export class KafkaConsumer extends Consumer {
     }
 
     /**
-     * Subscribes the consumer to the given topics and
-     * starts consuming if the `run` flag is set.
+     * Subscribes the consumer to the given topics and starts
+     * consuming if the `run` flag is set.
      * If the consumer was already running, it is stopped
      * before the topic subscription, due to library limitations.
      *
@@ -78,9 +79,9 @@ export class KafkaConsumer extends Consumer {
         // the remaining logic becomes consistent
         topics = Array.isArray(topics) ? topics : [topics];
 
-        // sanitizes topic names according to Kafka
-        // topic naming rules
-        topics = topics.map(topic => sanitizeTopicName(topic));
+        // sanitizes topic names according to Kafka topic naming rules
+        // avoiding illegal topic naming
+        topics = topics.map(topic => KafkaClient.sanitizeTopic(topic));
 
         // if the consumer is already running, stops it to
         // subscribe to another topic (this is required by design)

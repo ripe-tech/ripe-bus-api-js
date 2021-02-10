@@ -1,7 +1,8 @@
 import * as fs from "fs";
 import { conf } from "yonius";
-import { sanitizeTopicName } from "./kafka-client";
+import { KafkaClient } from "./kafka-client";
 import { KafkaConsumer } from "./kafka-consumer";
+
 export class KafkaRetryConsumer extends KafkaConsumer {
     constructor(owner, options = {}) {
         super(owner, options);
@@ -51,7 +52,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
 
         // sanitizes topic names according to Kafka
         // topic naming rules
-        topics = topics.map(topic => sanitizeTopicName(topic));
+        topics = topics.map(topic => KafkaClient.sanitizeTopic(topic));
 
         // if the consumer is already running, stops it to
         // subscribe to another topic
