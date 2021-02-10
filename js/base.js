@@ -80,7 +80,8 @@ export class API {
 
         // updates the on success event handler defaulting to a standard
         // auto confirm implementation in case no on success is defined
-        const onSuccessDefault = (message, topic) => options.autoConfirm && this.trigger("confirmation.success", message);
+        const onSuccessDefault = (message, topic) =>
+            options.autoConfirm && this.trigger("confirmation.success", message);
         options.onSuccess = options.onSuccess === undefined ? onSuccessDefault : options.onSuccess;
 
         await this._ensureConsumer();
