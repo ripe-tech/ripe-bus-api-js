@@ -89,6 +89,12 @@ export class API {
         await this.consumer.consume(topic, { callback: callback, ...options });
     }
 
+    async topics() {
+        const producer = await this._getProducer();
+        const topics = await producer.topics();
+        return topics;
+    }
+
     async destroy() {
         if (this.consumer) await this.consumer.disconnect();
         if (this.producer) await this.producer.disconnect();

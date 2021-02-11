@@ -76,6 +76,18 @@ export class KafkaProducer extends Producer {
         });
     }
 
+    /**
+     * Returns the available topics from adapter, may imply
+     * a remote connection to perform it.
+     *
+     * @returns {Array} The list of the available topics.
+     */
+    async topics() {
+        const kafkaClient = await KafkaClient.getInstance();
+        const topics = await kafkaClient.client.admin().listTopics();
+        return topics;
+    }
+
     _serializeMessage(messages) {
         return (Array.isArray(messages) ? messages : [messages]).map(message => ({
             value: JSON.stringify(message)

@@ -20,4 +20,8 @@ export class Producer {
     async produce(topic, message, options = {}) {
         throw new NotImplementedError();
     }
+
+    async topics() {
+        throw new NotImplementedError();
+    }
 }

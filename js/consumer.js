@@ -20,4 +20,8 @@ export class Consumer {
     async consume(topics, callback, options = {}) {
         throw new NotImplementedError();
     }
+
+    async topics() {
+        throw new NotImplementedError();
+    }
 }
