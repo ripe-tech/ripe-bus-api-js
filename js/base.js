@@ -54,17 +54,17 @@ export class API {
     }
 
     /**
-     * Builds a consumer if it doesn't already have one
-     * and starts consuming messages from the given topic,
-     * binding the callback to any new messages from the
-     * topic. The options can be a function, that corresponds
-     * to the callback, or an object that contains the callback
-     * and other functions and variables.
+     * Builds a consumer if it doesn't already have one and starts
+     * consuming messages from the given topic, binding the
+     * callback to any new messages from the topic. The options
+     * can be a function, that corresponds to the callback, or
+     * an object that contains the callback and other functions
+     * and variables.
      *
      * @param {String} topic Topic to consume messages from.
-     * @param {Function|Object} options Object that includes the callback for
-     * the message processing, callbacks for other events and
-     * configuration variables.
+     * @param {Function|Object} options Object that includes the
+     * callback for the message processing, callbacks for other
+     * events and configuration variables.
      */
     async bind(topic, options = {}) {
         let callback = null;
