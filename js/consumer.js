@@ -21,7 +21,7 @@ export class Consumer {
         throw new NotImplementedError();
     }
 
-    async listTopics() {
+    async listTopics(options = {}) {
         throw new NotImplementedError();
     }
 }
