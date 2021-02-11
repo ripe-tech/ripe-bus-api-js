@@ -21,7 +21,7 @@ export class Producer {
         throw new NotImplementedError();
     }
 
-    async getTopics() {
+    async listTopics() {
         throw new NotImplementedError();
     }
 }
