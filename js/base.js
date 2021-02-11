@@ -91,7 +91,7 @@ export class API {
 
     async listTopics(options = {}) {
         const handler = this.producer || this.consumer || (await this._getProducer());
-        const topics = await handler.listTopics();
+        const topics = await handler.listTopics(options);
         return topics;
     }
 
