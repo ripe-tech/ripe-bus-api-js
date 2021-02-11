@@ -100,7 +100,8 @@ export class API {
 
     async listTopics() {
         const client = await adapters[this.adapter + "Client"].getInstance();
-        return client.topics;
+        const topics = await client.getTopics();
+        return topics;
     }
 
     async destroy() {

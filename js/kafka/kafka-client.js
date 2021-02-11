@@ -71,14 +71,15 @@ export class KafkaClient extends Client {
                 retries: retries,
                 maxInFlightRequests: maxInFlightRequests
             }
-        }).admin();
+        });
     }
 
     get client() {
         return this._client;
     }
 
-    get topics() {
-        return this._client.listTopics();
+    async getTopics() {
+        const topics = await this._client.admin().listTopics();
+        return topics;
     }
 }
