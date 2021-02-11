@@ -5,6 +5,10 @@ export class Consumer {
         this.owner = owner;
     }
 
+    static async build(options = {}) {
+        throw new NotImplementedError();
+    }
+
     async connect() {
         throw new NotImplementedError();
     }

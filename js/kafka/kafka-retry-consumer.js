@@ -1,10 +1,12 @@
 import * as fs from "fs";
 import { conf } from "yonius";
+
+import { KafkaClient } from "./kafka-client";
 import { KafkaConsumer } from "./kafka-consumer";
 
 export class KafkaRetryConsumer extends KafkaConsumer {
-    constructor(owner, options = {}) {
-        super(owner, options);
+    async init(owner, options = {}) {
+        await super.init(owner, options);
 
         this.retries = conf("KAFKA_CONSUMER_MESSAGE_FAILURE_RETRIES", 5);
         this.retryDelay = conf("KAFKA_CONSUMER_MESSAGE_FIRST_DELAY", 50);
@@ -48,6 +50,10 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         // coerces a possible string value into an array so that
         // the remaining logic becomes consistent
         topics = Array.isArray(topics) ? topics : [topics];
+
+        // sanitizes topic names according to Kafka
+        // topic naming rules
+        topics = topics.map(topic => KafkaClient.sanitizeTopic(topic));
 
         // if the consumer is already running, stops it to
         // subscribe to another topic

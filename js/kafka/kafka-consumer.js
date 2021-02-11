@@ -1,11 +1,16 @@
 import { conf } from "yonius";
+
 import { KafkaClient } from "./kafka-client";
 import { Consumer } from "../consumer";
 
 export class KafkaConsumer extends Consumer {
-    constructor(owner, options = {}) {
-        super(owner, options);
+    static async build(owner, options = {}) {
+        const instance = new this(owner, options);
+        await instance.init(options);
+        return instance;
+    }
 
+    async init(owner, options = {}) {
         this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", "ripe-kafka-consumer");
         this.minBytes = conf("KAFKA_CONSUMER_FETCH_MIN_BYTES", 1);
         this.maxBytes = conf("KAFKA_CONSUMER_FETCH_MAX_BYTES", 1024 * 1024);
@@ -42,13 +47,14 @@ export class KafkaConsumer extends Consumer {
                 ? this.eachBatchAutoResolve
                 : options.eachBatchAutoResolve;
 
-        const kafkaClient = KafkaClient.getInstance(options);
-        this.consumer = kafkaClient.consumer({
+        const kafkaClient = await KafkaClient.getInstance();
+        this.consumer = kafkaClient.client.consumer({
             groupId: this.groupId,
             minBytes: this.minBytes,
             maxBytes: this.maxBytes,
             maxWaitTimeInMs: this.maxWaitTimeInMs
         });
+
         this.topicCallbacks = {};
         this.running = false;
     }
@@ -63,8 +69,8 @@ export class KafkaConsumer extends Consumer {
     }
 
     /**
-     * Subscribes the consumer to the given topic and
-     * starts consuming if the `run` flag is set.
+     * Subscribes the consumer to the given topics and starts
+     * consuming if the `run` flag is set.
      * If the consumer was already running, it is stopped
      * before the topic subscription, due to library limitations.
      *
@@ -77,6 +83,10 @@ export class KafkaConsumer extends Consumer {
         // coerces a possible string value into an array so that
         // the remaining logic becomes consistent
         topics = Array.isArray(topics) ? topics : [topics];
+
+        // sanitizes topic names according to Kafka topic naming rules
+        // avoiding illegal topic naming
+        topics = topics.map(topic => KafkaClient.sanitizeTopic(topic));
 
         // if the consumer is already running, stops it to
         // subscribe to another topic (this is required by design)
