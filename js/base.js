@@ -1,10 +1,19 @@
 import * as os from "os";
 import { conf, load, YoniusError } from "yonius";
-import { KafkaProducer, KafkaConsumer, KafkaRetryConsumer, KafkaRetryProducer } from "./kafka";
-
-const adapters = {
+import {
+    KafkaClient,
     KafkaProducer,
     KafkaConsumer,
+    KafkaRetryClient,
+    KafkaRetryConsumer,
+    KafkaRetryProducer
+} from "./kafka";
+
+const adapters = {
+    KafkaClient,
+    KafkaProducer,
+    KafkaConsumer,
+    KafkaRetryClient,
     KafkaRetryProducer,
     KafkaRetryConsumer
 };
@@ -87,6 +96,11 @@ export class API {
         await this._ensureConsumer();
 
         await this.consumer.consume(topic, { callback: callback, ...options });
+    }
+
+    async listTopics() {
+        const client = await adapters[this.adapter + "Client"].getInstance();
+        return client.topics;
     }
 
     async destroy() {

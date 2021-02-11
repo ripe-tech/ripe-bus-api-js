@@ -14,4 +14,8 @@ export class Client {
     get client() {
         throw new NotImplementedError();
     }
+
+    get topics() {
+        throw new NotImplementedError();
+    }
 }

@@ -71,10 +71,14 @@ export class KafkaClient extends Client {
                 retries: retries,
                 maxInFlightRequests: maxInFlightRequests
             }
-        });
+        }).admin();
     }
 
     get client() {
         return this._client;
+    }
+
+    get topics() {
+        return this._client.listTopics();
     }
 }
