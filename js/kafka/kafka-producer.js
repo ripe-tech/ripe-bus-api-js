@@ -76,8 +76,9 @@ export class KafkaProducer extends Producer {
         });
     }
 
-    async getTopics() {
-        const topics = await this.kafkaClient.admin().listTopics();
+    async listTopics(options = {}) {
+        const kafkaClient = await KafkaClient.getInstance(options);
+        const topics = await kafkaClient.client.admin().listTopics();
         return topics;
     }
 

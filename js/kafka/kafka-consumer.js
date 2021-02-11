@@ -104,8 +104,9 @@ export class KafkaConsumer extends Consumer {
         if (options.run) this._runConsumer(options);
     }
 
-    async getTopics() {
-        const topics = await this.kafkaClient.admin().listTopics();
+    async listTopics(options = {}) {
+        const kafkaClient = await KafkaClient.getInstance(options);
+        const topics = await kafkaClient.client.admin().listTopics();
         return topics;
     }
 

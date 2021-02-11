@@ -89,8 +89,8 @@ export class API {
         await this.consumer.consume(topic, { callback: callback, ...options });
     }
 
-    async listTopics() {
-        const handler = this.producer || this.consumer || this._getProducer();
+    async listTopics(options = {}) {
+        const handler = this.producer || this.consumer || (await this._getProducer());
         const topics = await handler.listTopics();
         return topics;
     }
