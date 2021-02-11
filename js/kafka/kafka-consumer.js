@@ -111,7 +111,7 @@ export class KafkaConsumer extends Consumer {
      * @returns {Array} The topic names.
      */
     async listTopics() {
-        const kafkaClient = await KafkaClient.getInstance(options);
+        const kafkaClient = await KafkaClient.getInstance();
         const topics = await kafkaClient.client.admin().listTopics();
         return topics;
     }
