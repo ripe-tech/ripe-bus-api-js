@@ -21,7 +21,7 @@ export class Producer {
         throw new NotImplementedError();
     }
 
-    async listTopics(options = {}) {
+    async topics() {
         throw new NotImplementedError();
     }
 }

@@ -77,13 +77,12 @@ export class KafkaProducer extends Producer {
     }
 
     /**
-     * Returns the available topics.
-     * Accesses the singleton connection to the Kafka client.
+     * Returns the available topics from adapter, may imply
+     * a remote connection to perform it.
      *
-     * @param {Function|Object} options Object that includes configuration variables.
-     * @returns {Array} The topic names.
+     * @returns {Array} The list of the available topics.
      */
-    async listTopics() {
+    async topics() {
         const kafkaClient = await KafkaClient.getInstance();
         const topics = await kafkaClient.client.admin().listTopics();
         return topics;

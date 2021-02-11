@@ -89,14 +89,9 @@ export class API {
         await this.consumer.consume(topic, { callback: callback, ...options });
     }
 
-    /**
-     * Lists the available topics.
-     *
-     * @returns {Array} The topic names.
-     */
-    async listTopics() {
-        const handler = this.producer || this.consumer || (await this._getProducer());
-        const topics = await handler.listTopics();
+    async topics() {
+        const producer = await this._getProducer();
+        const topics = await producer.topics();
         return topics;
     }
 
