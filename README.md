@@ -17,7 +17,7 @@ const bus = new RipeBusAPI();
 
 ### Producer
 
-The producer can send one or more messages to a specific topic. The third parameter allows to pass other options to configure the Bus client used.
+The producer can send one or more events:
 
 ```javascript
 bus.trigger("order.created", { id: 1, ... });
@@ -31,7 +31,7 @@ The topic defaults to the first part of the name (separated with '.'). The examp
 bus.trigger("order.created", { id: 1, ... });
 ```
 
-Event metadata is added by the API but you can explicitly set it as follows:
+The third parameter allows to pass other options to configure the Bus client used. Event metadata is added by the API but you can explicitly set it as follows:
 
 ```javascript
 bus.trigger("order.created", { id: 1, ... }, {
@@ -44,7 +44,7 @@ bus.trigger("order.created", { id: 1, ... }, {
 
 ### Consumer
 
-The consumer listens for a topic/event and executes a callback. The second parameter allows for a callback function or an object containing the callback and other options. The second parameter also allows for callbacks for `onSuccess` and `onError` functions if the `KafkaRetry` consumer is used. It also receives a list of `events` of interest: any event with a different name is ignored.
+The consumer listens for a topic and executes a callback. The second parameter allows for a callback function or an object containing the callback and other options. The second parameter also allows for callbacks for `onSuccess` and `onError` functions if the `KafkaRetry` consumer is used. It also receives a list of `events` of interest: any event with a different name is ignored.
 
 ```javascript
 bus.bind("order", message => { ... });
@@ -55,7 +55,7 @@ bus.bind("order", {
 });
 
 bus.bind("order", {
-    events: ["order.created"],
+    events: "order.created",
     callback: message => { ... },
     onSuccess: message => { ... },
     onError: message => { ... },
