@@ -7,5 +7,5 @@ export declare class Producer {
     connect(): Promise<void>;
     disconnect(): Promise<void>;
     produce(topic: string, message: Message, options?: ProduceOptions): Promise<object>;
-    listTopics(): Promise<string[]>;
+    topics(): Promise<string[]>;
 }

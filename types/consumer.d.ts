@@ -9,5 +9,5 @@ export declare class Consumer {
     connect(): Promise<void>;
     disconnect(): Promise<void>
     consume(topics: string | string[], callback: Function, options?: ConsumeOptions): Promise<object>;
-    listTopics(): Promise<string[]>;
+    topics(): Promise<string[]>;
 }

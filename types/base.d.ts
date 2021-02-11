@@ -35,7 +35,7 @@ export declare class API {
     constructor(options?: ApiOptions);
     trigger(name: string, payload: Payload, options?: TriggerOptions): Promise<void>;
     bind(topic: string, options?: ConsumerCallback | BindOptions): Promise<void>;
-    listTopics(): Promise<string[]>;
+    topics(): Promise<string[]>;
     build(): Promise<void>;
     runConsumer(messageProcessor: Function, sendConfirmation?: Function, sendError?: Function): Promise<object>;
     sendMessages(messages: string[] | object[], topic?: string): Promise<object>;
