@@ -77,9 +77,4 @@ export class KafkaClient extends Client {
     get client() {
         return this._client;
     }
-
-    async getTopics() {
-        const topics = await this._client.admin().listTopics();
-        return topics;
-    }
 }

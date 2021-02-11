@@ -104,6 +104,11 @@ export class KafkaConsumer extends Consumer {
         if (options.run) this._runConsumer(options);
     }
 
+    async getTopics() {
+        const topics = await this.kafkaClient.admin().listTopics();
+        return topics;
+    }
+
     /**
      * Starts the consumer with the given configuration and
      * processes each message.

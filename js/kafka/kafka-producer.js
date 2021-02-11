@@ -76,6 +76,11 @@ export class KafkaProducer extends Producer {
         });
     }
 
+    async getTopics() {
+        const topics = await this.kafkaClient.admin().listTopics();
+        return topics;
+    }
+
     _serializeMessage(messages) {
         return (Array.isArray(messages) ? messages : [messages]).map(message => ({
             value: JSON.stringify(message)

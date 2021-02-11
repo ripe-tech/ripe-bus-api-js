@@ -14,8 +14,4 @@ export class Client {
     get client() {
         throw new NotImplementedError();
     }
-
-    async getTopics() {
-        throw new NotImplementedError();
-    }
 }

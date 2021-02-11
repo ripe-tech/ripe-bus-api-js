@@ -1,19 +1,10 @@
 import * as os from "os";
 import { conf, load, YoniusError } from "yonius";
-import {
-    KafkaClient,
-    KafkaProducer,
-    KafkaConsumer,
-    KafkaRetryClient,
-    KafkaRetryConsumer,
-    KafkaRetryProducer
-} from "./kafka";
+import { KafkaProducer, KafkaConsumer, KafkaRetryConsumer, KafkaRetryProducer } from "./kafka";
 
 const adapters = {
-    KafkaClient,
     KafkaProducer,
     KafkaConsumer,
-    KafkaRetryClient,
     KafkaRetryProducer,
     KafkaRetryConsumer
 };
@@ -99,8 +90,8 @@ export class API {
     }
 
     async listTopics() {
-        const client = await adapters[this.adapter + "Client"].getInstance();
-        const topics = await client.getTopics();
+        const handler = this.producer || this.consumer || this._getProducer();
+        const topics = await handler.listTopics();
         return topics;
     }
 
