@@ -92,12 +92,11 @@ export class API {
     /**
      * Lists the available topics.
      *
-     * @param {Function|Object} options Object that includes configuration variables.
-     * @returns {String[]} The topic names.
+     * @returns {Array} The topic names.
      */
-    async listTopics(options = {}) {
+    async listTopics() {
         const handler = this.producer || this.consumer || (await this._getProducer());
-        const topics = await handler.listTopics(options);
+        const topics = await handler.listTopics();
         return topics;
     }
 
