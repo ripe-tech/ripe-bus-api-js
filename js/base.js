@@ -89,6 +89,12 @@ export class API {
         await this.consumer.consume(topic, { callback: callback, ...options });
     }
 
+    /**
+     * Lists the available topics.
+     *
+     * @param {Function|Object} options Object that includes configuration variables.
+     * @returns {String[]} The topic names.
+     */
     async listTopics(options = {}) {
         const handler = this.producer || this.consumer || (await this._getProducer());
         const topics = await handler.listTopics(options);

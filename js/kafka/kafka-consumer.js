@@ -104,6 +104,13 @@ export class KafkaConsumer extends Consumer {
         if (options.run) this._runConsumer(options);
     }
 
+    /**
+     * Returns the available topics.
+     * Accesses the singleton connection to the Kafka client.
+     *
+     * @param {Function|Object} options Object that includes configuration variables.
+     * @returns {String[]} The topic names.
+     */
     async listTopics(options = {}) {
         const kafkaClient = await KafkaClient.getInstance(options);
         const topics = await kafkaClient.client.admin().listTopics();
