@@ -31,7 +31,7 @@ The topic defaults to the first part of the name (separated with '.'). The examp
 bus.trigger("order.created", { id: 1, ... });
 ```
 
-The third parameter allows to pass other options to configure the Bus client used. Event metadata is added by the API but you can explicitly set it as follows:
+The third parameter allows to pass other options to configure event trigger operation. Additional event metadata is added by the API but you can explicitly set it as follows (using options):
 
 ```javascript
 bus.trigger("order.created", { id: 1, ... }, {
