@@ -63,6 +63,12 @@ bus.bind("order", {
 });
 ```
 
+It is also possible to bind to multiple topics in a single call:
+
+```javascript
+bus.bind(["order", "ripe_twitch:order"], message => { ... });
+```
+
 ## Configuration
 
 | Name                                     | Type  | Default               | Description                                                                                                                                      |
