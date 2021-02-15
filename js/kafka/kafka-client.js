@@ -52,13 +52,16 @@ export class KafkaClient extends Client {
         clientId = options.clientId === undefined ? clientId : options.clientId;
         connectionTimeout =
             options.connectionTimeout === undefined ? connectionTimeout : options.connectionTimeout;
-        requestTimeout = options.requestTimeout ? requestTimeout : options.requestTimeout;
-        initialRetryTime = options.initialRetryTime ? initialRetryTime : options.initialRetryTime;
-        maxRetryTime = options.maxRetryTime ? maxRetryTime : options.maxRetryTime;
-        retries = options.retries ? retries : options.retries;
-        maxInFlightRequests = options.maxInFlightRequests
-            ? maxInFlightRequests
-            : options.maxInFlightRequests;
+        requestTimeout =
+            options.requestTimeout === undefined ? requestTimeout : options.requestTimeout;
+        initialRetryTime =
+            options.initialRetryTime === undefined ? initialRetryTime : options.initialRetryTime;
+        maxRetryTime = options.maxRetryTime === undefined ? maxRetryTime : options.maxRetryTime;
+        retries = options.retries === undefined ? retries : options.retries;
+        maxInFlightRequests =
+            options.maxInFlightRequests === undefined
+                ? maxInFlightRequests
+                : options.maxInFlightRequests;
 
         this._client = new Kafka({
             brokers: hosts.split(","),
