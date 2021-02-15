@@ -1,6 +1,6 @@
 {
     "name": "ripe-bus-api",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "The Ripe Bus API client",
     "keywords": [
         "api",
