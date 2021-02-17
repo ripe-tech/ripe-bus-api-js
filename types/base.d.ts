@@ -13,11 +13,11 @@ export type ApiOptions = {
 }
 
 export type TriggerOptions = {
-    name: string,
+    name?: string,
     origin?: string,
-    hostname: string,
-    datatype: string,
-    timestamp: number
+    hostname?: string,
+    datatype?: string,
+    timestamp?: number
 }
 
 export type BindOptions = {
