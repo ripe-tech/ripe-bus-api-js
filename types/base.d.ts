@@ -22,8 +22,8 @@ export type TriggerOptions = {
 
 export type BindOptions = {
     events?: string | string[],
-    autoConfirm: boolean,
-    run: boolean,
+    autoConfirm?: boolean,
+    run?: boolean,
     callback?: ConsumerCallback,
     onSuccess?: ConsumerCallback,
     onError?: ConsumerCallback
