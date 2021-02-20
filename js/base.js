@@ -84,8 +84,12 @@ export class API {
             options.autoConfirm && this.trigger("confirmation.success", message);
         options.onSuccess = options.onSuccess === undefined ? onSuccessDefault : options.onSuccess;
 
+        // makes sure that there's a valid consumer instance that is
+        // connected to the proper remote provider
         await this._ensureConsumer();
 
+        // start the consuming process for the requested topic
+        // this may block the current execution into an event loop
         await this.consumer.consume(topic, { callback: callback, ...options });
     }
 

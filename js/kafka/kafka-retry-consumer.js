@@ -59,7 +59,11 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         // subscribe to another topic
         if (this.running) await this.consumer.stop();
 
-        await Promise.all(topics.map(topic => this.consumer.subscribe({ topic: topic })));
+        // subscribes to the complete set of requested topics (async fashion)
+        // and wait for the respective promises in parallel
+        await Promise.all(
+            topics.map(async topic => await this.consumer.subscribe({ topic: topic }))
+        );
         topics.forEach(topic => (this.topicCallbacks[topic] = options.callback));
 
         // retries processing previously failed messages every second
@@ -68,7 +72,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         // run the consumer only if the flag is true, making it
         // possible to subscribe to several topics first and
         // then execute the consumer
-        if (options.run) this._runConsumer(options);
+        if (options.run) await this._runConsumer(options);
     }
 
     /**

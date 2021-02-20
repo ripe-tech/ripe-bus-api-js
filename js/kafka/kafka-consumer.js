@@ -92,7 +92,8 @@ export class KafkaConsumer extends Consumer {
         // subscribe to another topic (this is required by design)
         if (this.running) await this.consumer.stop();
 
-        // subscribes to the complete set of required topics (async fashion)
+        // subscribes to the complete set of requested topics (async fashion)
+        // and wait for the respective promises in parallel
         await Promise.all(
             topics.map(async topic => await this.consumer.subscribe({ topic: topic }))
         );
@@ -101,7 +102,7 @@ export class KafkaConsumer extends Consumer {
         // run the consumer only if the flag is true, making it
         // possible to subscribe to several topics first and
         // then execute the consumer
-        if (options.run) this._runConsumer(options);
+        if (options.run) await this._runConsumer(options);
     }
 
     /**
@@ -149,7 +150,7 @@ export class KafkaConsumer extends Consumer {
                 : [options.events];
 
         this.running = true;
-        this.consumer.run({
+        await this.consumer.run({
             autoCommit: autoCommit,
             autoCommitInterval: autoCommitInterval,
             autoCommitThreshold: autoCommitThreshold,
