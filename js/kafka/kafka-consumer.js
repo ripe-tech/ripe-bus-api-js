@@ -103,6 +103,11 @@ export class KafkaConsumer extends Consumer {
         // possible to subscribe to several topics first and
         // then execute the consumer
         if (options.run) await this._runConsumer(options);
+
+        // if the event loop should be blocked under the async
+        // execution, then runs an infinite await operation over
+        // a promise that is never resolved
+        if (options.block) await new Promise(() => true);
     }
 
     /**

@@ -71,9 +71,20 @@ export class API {
 
         if (typeof options === "function") {
             callback = options;
-            options = { autoConfirm: true, run: true, ...this.options };
+            options = {
+                autoConfirm: true,
+                run: true,
+                block: false,
+                ...this.options
+            };
         } else if (typeof options === "object") {
-            options = { autoConfirm: true, run: true, ...this.options, ...options };
+            options = {
+                autoConfirm: true,
+                run: true,
+                block: false,
+                ...this.options,
+                ...options
+            };
         } else {
             throw new YoniusError("Invalid options type");
         }
