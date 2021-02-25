@@ -1,3 +1,4 @@
+import { v4 } from "uuid";
 import { conf } from "yonius";
 
 import { KafkaClient } from "./kafka-client";
@@ -11,7 +12,7 @@ export class KafkaConsumer extends Consumer {
     }
 
     async init(options = {}) {
-        this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", "ripe-kafka-consumer");
+        this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", v4());
         this.minBytes = conf("KAFKA_CONSUMER_FETCH_MIN_BYTES", 1);
         this.maxBytes = conf("KAFKA_CONSUMER_FETCH_MAX_BYTES", 1024 * 1024);
         this.maxWaitTimeInMs = conf("KAFKA_CONSUMER_FETCH_MAX_WAIT", 100);
