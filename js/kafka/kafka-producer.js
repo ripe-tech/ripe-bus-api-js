@@ -10,7 +10,7 @@ export class KafkaProducer extends Producer {
         return instance;
     }
 
-    async init(owner, options = {}) {
+    async init(options = {}) {
         this.metadataMaxAge = conf("KAFKA_PRODUCER_METADATA_MAX_AGE", 300000);
         this.allowAutoTopicCreation = conf("KAFKA_PRODUCER_AUTO_TOPIC_CREATION", true);
         this.transactionTimeout = conf("KAFKA_PRODUCER_TRANSITION_TIMEOUT", 60000);

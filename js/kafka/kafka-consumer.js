@@ -10,7 +10,7 @@ export class KafkaConsumer extends Consumer {
         return instance;
     }
 
-    async init(owner, options = {}) {
+    async init(options = {}) {
         this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", "ripe-kafka-consumer");
         this.minBytes = conf("KAFKA_CONSUMER_FETCH_MIN_BYTES", 1);
         this.maxBytes = conf("KAFKA_CONSUMER_FETCH_MAX_BYTES", 1024 * 1024);

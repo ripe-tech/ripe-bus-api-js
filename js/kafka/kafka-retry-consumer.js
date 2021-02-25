@@ -5,8 +5,8 @@ import { KafkaClient } from "./kafka-client";
 import { KafkaConsumer } from "./kafka-consumer";
 
 export class KafkaRetryConsumer extends KafkaConsumer {
-    async init(owner, options = {}) {
-        await super.init(owner, options);
+    async init(options = {}) {
+        await super.init(options);
 
         this.retries = conf("KAFKA_CONSUMER_MESSAGE_FAILURE_RETRIES", 5);
         this.retryDelay = conf("KAFKA_CONSUMER_MESSAGE_FIRST_DELAY", 50);
