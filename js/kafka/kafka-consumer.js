@@ -12,7 +12,7 @@ export class KafkaConsumer extends Consumer {
     }
 
     async init(options = {}) {
-        this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", v4());
+        this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", this._randomValue());
         this.minBytes = conf("KAFKA_CONSUMER_FETCH_MIN_BYTES", 1);
         this.maxBytes = conf("KAFKA_CONSUMER_FETCH_MAX_BYTES", 1024 * 1024);
         this.maxWaitTimeInMs = conf("KAFKA_CONSUMER_FETCH_MAX_WAIT", 100);
@@ -209,6 +209,17 @@ export class KafkaConsumer extends Consumer {
 
     _deserializeMessage(message) {
         return JSON.parse(message.value.toString());
+    }
+
+    _randomValue() {
+        let randomValue;
+        try {
+            randomValue = v4();
+        } catch (err) {
+            const randomPart = () => Math.random().toString(36).substring(2, 15);
+            randomValue = randomPart() + randomPart();
+        }
+        return randomValue;
     }
 }
 
