@@ -50,7 +50,6 @@
     "dependencies": {
         "kafkajs": "^1.15.0",
         "sinon": "^9.2.4",
-        "uuid": "^8.3.2",
         "yonius": "^0.7.2"
     },
     "devDependencies": {

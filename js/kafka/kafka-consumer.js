@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
 import { conf } from "yonius";
 
 import { KafkaClient } from "./kafka-client";
@@ -7,12 +6,12 @@ import { Consumer } from "../consumer";
 export class KafkaConsumer extends Consumer {
     static async build(owner, options = {}) {
         const instance = new this(owner, options);
-        await instance.init(options);
+        await instance.init(owner, options);
         return instance;
     }
 
     async init(owner, options = {}) {
-        this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", `ripe-kafka-consumer-${uuidv4()}`);
+        this.groupId = conf("KAFKA_CONSUMER_GROUP_ID", "ripe-kafka-consumer");
         this.minBytes = conf("KAFKA_CONSUMER_FETCH_MIN_BYTES", 1);
         this.maxBytes = conf("KAFKA_CONSUMER_FETCH_MAX_BYTES", 1024 * 1024);
         this.maxWaitTimeInMs = conf("KAFKA_CONSUMER_FETCH_MAX_WAIT", 100);

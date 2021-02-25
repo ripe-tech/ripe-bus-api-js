@@ -5,7 +5,7 @@ export class Consumer {
         this.owner = owner;
     }
 
-    static async build(options = {}) {
+    static async build(owner, options = {}) {
         throw new NotImplementedError();
     }
 
