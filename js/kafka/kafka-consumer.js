@@ -182,7 +182,7 @@ export class KafkaConsumer extends Consumer {
                         // its reception
                         await this._processMessage(message, batch.topic, options);
                     } catch (err) {
-                        console.error(`Problem handling message ${message} (${err})`);
+                        console.error(`Problem handling message ${message} in topic ${batch.topic} (${err})`);
                     } finally {
                         await heartbeat();
                     }
