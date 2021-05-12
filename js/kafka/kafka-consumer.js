@@ -171,18 +171,19 @@ export class KafkaConsumer extends Consumer {
                     try {
                         // deserialize the message from its serialized structure
                         // so that it can be properly handled
-                        message = this._deserializeMessage(message);
+                        const deserializedMessage = this._deserializeMessage(message);
 
                         // if this consumer is bound to specific events
                         // but this message doesn't match that, just
                         // ignores it altogether
-                        if (events !== null && !options.events.includes(message.name)) return;
+                        if (events !== null && !options.events.includes(deserializedMessage.name)) return;
 
                         // processes the message, notifying any listener about
                         // its reception
-                        await this._processMessage(message, batch.topic, options);
+                        await this._processMessage(deserializedMessage, batch.topic, options);
                     } catch (err) {
-                        console.error(`Problem handling message ${message} in topic ${batch.topic} (${err})`);
+                        const result = { error: err.message, stack: err.stack ? err.stack.split("\n") : [] };
+                        console.error(`Problem handling message (offset=${message.offset}, timestamp=${message.timestamp}) in topic ${batch.topic}: ${result}`);
                     } finally {
                         await heartbeat();
                     }
