@@ -176,8 +176,9 @@ export class KafkaConsumer extends Consumer {
                         // if this consumer is bound to specific events
                         // but this message doesn't match that, just
                         // ignores it altogether
-                        if (events !== null && !options.events.includes(deserializedMessage.name))
-                            { return; }
+                        if (events !== null && !options.events.includes(deserializedMessage.name)) {
+                            return;
+                        }
 
                         // processes the message, notifying any listener about
                         // its reception
@@ -188,7 +189,9 @@ export class KafkaConsumer extends Consumer {
                             stack: err.stack ? err.stack.split("\n") : []
                         };
                         console.error(
-                            `Problem handling message (offset=${message.offset}, timestamp=${message.timestamp}) in topic ${batch.topic}: ${result}`
+                            `Problem handling message (offset=${message.offset}, timestamp=${
+                                message.timestamp
+                            }) in topic ${batch.topic}: ${JSON.stringify(result)}`
                         );
                     } finally {
                         await heartbeat();
