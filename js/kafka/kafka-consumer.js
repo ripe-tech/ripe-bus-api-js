@@ -163,7 +163,7 @@ export class KafkaConsumer extends Consumer {
             partitionsConsumedConcurrently: partitionsConsumedConcurrently,
             eachBatchAutoResolve: eachBatchAutoResolve,
             eachBatch: async ({ batch, heartbeat, isRunning, isStale }) => {
-                for (let message of batch.messages) {
+                for (const message of batch.messages) {
                     // does not process message if message is marked
                     // as stale or if the consumer is not running
                     if (!isRunning() || isStale()) return;
@@ -176,14 +176,20 @@ export class KafkaConsumer extends Consumer {
                         // if this consumer is bound to specific events
                         // but this message doesn't match that, just
                         // ignores it altogether
-                        if (events !== null && !options.events.includes(deserializedMessage.name)) return;
+                        if (events !== null && !options.events.includes(deserializedMessage.name))
+                            { return; }
 
                         // processes the message, notifying any listener about
                         // its reception
                         await this._processMessage(deserializedMessage, batch.topic, options);
                     } catch (err) {
-                        const result = { error: err.message, stack: err.stack ? err.stack.split("\n") : [] };
-                        console.error(`Problem handling message (offset=${message.offset}, timestamp=${message.timestamp}) in topic ${batch.topic}: ${result}`);
+                        const result = {
+                            error: err.message,
+                            stack: err.stack ? err.stack.split("\n") : []
+                        };
+                        console.error(
+                            `Problem handling message (offset=${message.offset}, timestamp=${message.timestamp}) in topic ${batch.topic}: ${result}`
+                        );
                     } finally {
                         await heartbeat();
                     }
