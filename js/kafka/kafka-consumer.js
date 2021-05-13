@@ -185,7 +185,7 @@ export class KafkaConsumer extends Consumer {
                         await this._processMessage(deserializedMessage, batch.topic, options);
                     } catch (err) {
                         console.trace(
-                            `Problem handling message (offset=${message.offset}, timestamp=${message.timestamp}) in topic '${batch.topic}'`
+                            `Problem handling message (offset=${message.offset}, timestamp=${message.timestamp}) in topic '${batch.topic}': ${err}`
                         );
                     } finally {
                         await heartbeat();
