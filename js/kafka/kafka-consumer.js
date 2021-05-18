@@ -163,7 +163,7 @@ export class KafkaConsumer extends Consumer {
             partitionsConsumedConcurrently: partitionsConsumedConcurrently,
             eachBatchAutoResolve: eachBatchAutoResolve,
             eachBatch: async ({ batch, heartbeat, isRunning, isStale }) => {
-                for (let message of batch.messages) {
+                for (const message of batch.messages) {
                     // does not process message if message is marked
                     // as stale or if the consumer is not running
                     if (!isRunning() || isStale()) return;
@@ -171,18 +171,24 @@ export class KafkaConsumer extends Consumer {
                     try {
                         // deserialize the message from its serialized structure
                         // so that it can be properly handled
-                        message = this._deserializeMessage(message);
+                        const messageD = this._deserializeMessage(message);
 
                         // if this consumer is bound to specific events
                         // but this message doesn't match that, just
                         // ignores it altogether
-                        if (events !== null && !options.events.includes(message.name)) return;
+                        if (events !== null && !options.events.includes(messageD.name)) {
+                            return;
+                        }
 
                         // processes the message, notifying any listener about
-                        // its reception
-                        await this._processMessage(message, batch.topic, options);
+                        // its reception, the processing of the message is done
+                        // for the provided topic and taking into consideration
+                        // the provided set of options
+                        await this._processMessage(messageD, batch.topic, options);
                     } catch (err) {
-                        console.error(`Problem handling message ${message} (${err})`);
+                        console.trace(
+                            `Problem handling message (offset=${message.offset}, timestamp=${message.timestamp}) in topic '${batch.topic}': ${err}`
+                        );
                     } finally {
                         await heartbeat();
                     }
