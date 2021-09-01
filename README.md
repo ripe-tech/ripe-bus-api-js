@@ -88,7 +88,7 @@ RIPE Bus API (for Javascript) is currently licensed under the [Apache License, V
 
 ## Build Automation
 
-[![Build Status](https://travis-ci.com/ripe-tech/ripe-bus-api-js.svg?branch=master)](https://travis-ci.com/ripe-tech/ripe-bus-api-js)
+[![Build Status](https://app.travis-ci.com/ripe-tech/ripe-bus-api-js.svg?branch=master)](https://travis-ci.com/github/ripe-tech/ripe-bus-api-js)
 [![Build Status GitHub](https://github.com/ripe-tech/ripe-bus-api-js/workflows/Main%20Workflow/badge.svg)](https://github.com/ripe-tech/ripe-bus-api-js/actions)
 [![npm Status](https://img.shields.io/npm/v/ripe-bus-api.svg)](https://www.npmjs.com/package/ripe-bus-api)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://www.apache.org/licenses/)
