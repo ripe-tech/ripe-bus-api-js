@@ -113,7 +113,7 @@ export class KafkaConsumer extends Consumer {
             if (events) {
                 events.forEach(event => (callbacks[event] = options.callback));
             } else {
-                callbacks[""] = options.callback;
+                callbacks["*"] = options.callback;
             }
             this.topicCallbacks[topic] = callbacks;
         });
@@ -214,15 +214,20 @@ export class KafkaConsumer extends Consumer {
      * variables and callback methods.
      */
     async _processMessage(message, topic, options) {
-        // retrieves all the callbacks for the message topic
-        // and event and calls them, returning if there are
-        // no subscribers to the message
+        // retrieves all the callbacks for the provided: message, topic
+        // and event to be able to call them latter
         const callbackPromises = Object.entries(this.topicCallbacks[topic])
-                .filter(([event, callback]) => event === message.name || event === "")
+                .filter(([event, callback]) => event === message.name || event === "*")
             .map(([event, callback]) => callback(message, topic));
+
+        // returns the control flow immediately in case there
+        // are no callbacks to be called, this ensures that the
+        // message is not marked as "consumed" as there were no
+        // valid callbacks called for it
         if (callbackPromises.length === 0) return;
 
         await Promise.all(callbackPromises);
+
         if (options.onSuccess) options.onSuccess(message, topic);
     }
 
