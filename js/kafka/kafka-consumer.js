@@ -166,12 +166,6 @@ export class KafkaConsumer extends Consumer {
             options.eachBatchAutoResolve === undefined
                 ? this.eachBatchAutoResolve
                 : options.eachBatchAutoResolve;
-        const events =
-            options.events === undefined
-                ? null
-                : Array.isArray(options.events)
-                ? options.events
-                : [options.events];
 
         this.running = true;
         await this.consumer.run({
