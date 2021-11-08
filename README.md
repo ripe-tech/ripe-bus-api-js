@@ -115,9 +115,15 @@ bus.bind(["order", "ripe_twitch:order"], message => { ... });
 
 ## Configuration
 
+### Global
+
 | Name                                                | Type   | Default            | Description                                                                                                                                                                                                           |
 | --------------------------------------------------- | ------ | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **BUS_ADAPTER**                                     | `str`  | `kafka`            | The name of the bus adapter adapter to be used (eg: `kafka`, `kafkaRetry`).                                                                                                                                           |
+### Kafka
+
+| Name                                                | Type   | Default            | Description                                                                                                                                                                                                           |
+| --------------------------------------------------- | ------ | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **KAFKA_HOSTS**                                     | `str`  | `localhost:9092`   | The hostname and port of the Kafka nodes to be used, separated by a `,` (comma).                                                                                                                                      |
 | **KAFKA_CLIENT_ID**                                 | `str`  | `ripe-kafka`       | Kafka client ID, uniquely identifies a connection to a Kafka broker (more [here](https://kafka.js.org/docs/1.13.0/configuration)).                                                                                    |
 | **KAFKA_CONNECT_TIMEOUT**                           | `int`  | `10000`            | The amount of time in milliseconds to wait for a successful connection to a Kafka broker.                                                                                                                             |
