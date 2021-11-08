@@ -191,17 +191,6 @@ export class KafkaConsumer extends Consumer {
                         // so that it can be properly handled
                         const messageD = this._deserializeMessage(message);
 
-                        // if this consumer or any consumer for this topic
-                        // (two consecutive binds that ran the consumer) is
-                        // bound to specific events but this message doesn't
-                        // match that, just ignores it altogether
-                        if (
-                            events !== null &&
-                            !Object.keys(this.topicCallbacks[batch.topic]).includes(messageD.name)
-                        ) {
-                            return;
-                        }
-
                         // processes the message, notifying any listener about
                         // its reception, the processing of the message is done
                         // for the provided topic and taking into consideration
@@ -231,9 +220,14 @@ export class KafkaConsumer extends Consumer {
      * variables and callback methods.
      */
     async _processMessage(message, topic, options) {
+        // retrieves all the callbacks for the message topic
+        // and event and calls them, returning if there are
+        // no subscribers to the message
         const callbackPromises = Object.entries(this.topicCallbacks[topic])
                 .filter(([event, callback]) => event === message.name || event === "")
             .map(([event, callback]) => callback(message, topic));
+        if (callbackPromises.length === 0) return;
+
         await Promise.all(callbackPromises);
         if (options.onSuccess) options.onSuccess(message, topic);
     }
