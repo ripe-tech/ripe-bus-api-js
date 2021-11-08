@@ -46,7 +46,6 @@ export class KafkaClient extends Client {
         let initialRetryTime = conf("KAFKA_INITIAL_RETRY_TIME", 300);
         let maxRetryTime = conf("KAFKA_MAX_RETRY_TIME", 30000);
         let retries = conf("KAFKA_RETRIES", 5);
-        let maxInFlightRequests = conf("KAFKA_MAX_INFLIGHT_REQUESTS", null);
 
         hosts = options.hosts === undefined ? hosts : options.hosts;
         clientId = options.clientId === undefined ? clientId : options.clientId;
@@ -58,10 +57,6 @@ export class KafkaClient extends Client {
             options.initialRetryTime === undefined ? initialRetryTime : options.initialRetryTime;
         maxRetryTime = options.maxRetryTime === undefined ? maxRetryTime : options.maxRetryTime;
         retries = options.retries === undefined ? retries : options.retries;
-        maxInFlightRequests =
-            options.maxInFlightRequests === undefined
-                ? maxInFlightRequests
-                : options.maxInFlightRequests;
 
         this._client = new Kafka({
             brokers: hosts.split(","),
@@ -71,8 +66,7 @@ export class KafkaClient extends Client {
             retry: {
                 initialRetryTime: initialRetryTime,
                 maxRetryTime: maxRetryTime,
-                retries: retries,
-                maxInFlightRequests: maxInFlightRequests
+                retries: retries
             }
         });
     }
