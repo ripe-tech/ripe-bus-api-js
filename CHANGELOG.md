@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-*
+* Allow callbacks for each event of each topic so that it is possible to sucbscribe to the same topic for different events
+* Added `override` option to override the previous callbacks made for a topic subscription
 
 ### Changed
 

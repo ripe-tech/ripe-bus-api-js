@@ -98,7 +98,25 @@ export class KafkaConsumer extends Consumer {
         await Promise.all(
             topics.map(async topic => await this.consumer.subscribe({ topic: topic }))
         );
-        topics.forEach(topic => (this.topicCallbacks[topic] = options.callback));
+
+        const events =
+            options.events === undefined
+                ? null
+                : Array.isArray(options.events)
+                ? options.events
+                : [options.events];
+
+        // saves the callbacks for each topic and event and overrides them with
+        // with the current callback if the option is defined
+        topics.forEach(topic => {
+            const callbacks = options.override ? {} : this.topicCallbacks[topic] || {};
+            if (events) {
+                events.forEach(event => (callbacks[event] = options.callback));
+            } else {
+                callbacks["*"] = options.callback;
+            }
+            this.topicCallbacks[topic] = callbacks;
+        });
 
         // run the consumer only if the flag is true, making it
         // possible to subscribe to several topics first and
@@ -148,12 +166,6 @@ export class KafkaConsumer extends Consumer {
             options.eachBatchAutoResolve === undefined
                 ? this.eachBatchAutoResolve
                 : options.eachBatchAutoResolve;
-        const events =
-            options.events === undefined
-                ? null
-                : Array.isArray(options.events)
-                ? options.events
-                : [options.events];
 
         this.running = true;
         await this.consumer.run({
@@ -173,13 +185,6 @@ export class KafkaConsumer extends Consumer {
                         // so that it can be properly handled
                         const messageD = this._deserializeMessage(message);
 
-                        // if this consumer is bound to specific events
-                        // but this message doesn't match that, just
-                        // ignores it altogether
-                        if (events !== null && !options.events.includes(messageD.name)) {
-                            return;
-                        }
-
                         // processes the message, notifying any listener about
                         // its reception, the processing of the message is done
                         // for the provided topic and taking into consideration
@@ -198,8 +203,8 @@ export class KafkaConsumer extends Consumer {
     }
 
     /**
-     * Calls the given callback for the topic and sends a
-     * message confirming that the event was processed. The
+     * Calls the given callbacks for the topic and event and sends
+     * a message confirming that the event was processed. The
      * `onSuccess` logic can be outsourced if a function
      * was provided.
      *
@@ -209,7 +214,20 @@ export class KafkaConsumer extends Consumer {
      * variables and callback methods.
      */
     async _processMessage(message, topic, options) {
-        await this.topicCallbacks[topic](message, topic);
+        // retrieves all the callbacks for the provided: message, topic
+        // and event to be able to call them latter
+        const callbackPromises = Object.entries(this.topicCallbacks[topic])
+                .filter(([event, callback]) => event === message.name || event === "*")
+            .map(([event, callback]) => callback(message, topic));
+
+        // returns the control flow immediately in case there
+        // are no callbacks to be called, this ensures that the
+        // message is not marked as "consumed" as there were no
+        // valid callbacks called for it
+        if (callbackPromises.length === 0) return;
+
+        await Promise.all(callbackPromises);
+
         if (options.onSuccess) options.onSuccess(message, topic);
     }
 
