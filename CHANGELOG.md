@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-*
+* Allow multiple callbacks for each topic subscription
+* Added `override` option to override the previous callbacks made for a `bind` on a topic
 
 ### Changed
 

@@ -98,7 +98,14 @@ export class KafkaConsumer extends Consumer {
         await Promise.all(
             topics.map(async topic => await this.consumer.subscribe({ topic: topic }))
         );
-        topics.forEach(topic => (this.topicCallbacks[topic] = options.callback));
+
+        // saves the callbacks for each topic and overrides them with
+        // with the current callback if the option is defined
+        topics.forEach(topic => {
+            const callbacks = options.override ? [] : this.topicCallbacks[topic] || [];
+            callbacks.push(options.callback);
+            this.topicCallbacks[topic] = callbacks;
+        });
 
         // run the consumer only if the flag is true, making it
         // possible to subscribe to several topics first and
@@ -198,7 +205,7 @@ export class KafkaConsumer extends Consumer {
     }
 
     /**
-     * Calls the given callback for the topic and sends a
+     * Calls the given callbacks for the topic and sends a
      * message confirming that the event was processed. The
      * `onSuccess` logic can be outsourced if a function
      * was provided.
@@ -209,7 +216,7 @@ export class KafkaConsumer extends Consumer {
      * variables and callback methods.
      */
     async _processMessage(message, topic, options) {
-        await this.topicCallbacks[topic](message, topic);
+        await Promise.all(this.topicCallbacks[topic].map(callback => callback(message, topic)));
         if (options.onSuccess) options.onSuccess(message, topic);
     }
 
