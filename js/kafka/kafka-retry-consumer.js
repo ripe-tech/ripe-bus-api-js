@@ -64,7 +64,25 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         await Promise.all(
             topics.map(async topic => await this.consumer.subscribe({ topic: topic }))
         );
-        topics.forEach(topic => (this.topicCallbacks[topic] = options.callback));
+
+        const events =
+            options.events === undefined
+                ? null
+                : Array.isArray(options.events)
+                ? options.events
+                : [options.events];
+
+        // saves the callbacks for each topic and event and overrides them with
+        // with the current callback if the option is defined
+        topics.forEach(topic => {
+            const callbacks = options.override ? {} : this.topicCallbacks[topic] || {};
+            if (events) {
+                events.forEach(event => (callbacks[event] = options.callback));
+            } else {
+                callbacks["*"] = options.callback;
+            }
+            this.topicCallbacks[topic] = callbacks;
+        });
 
         // retries processing previously failed messages every second
         setInterval(() => this._retry(options), 1000);
@@ -81,11 +99,9 @@ export class KafkaRetryConsumer extends KafkaConsumer {
     }
 
     /**
-     * Calls the given callback for the topic and sends a
-     * message confirming that the event was processed. The
-     * `onSuccess` logic can be outsourced if a function
-     * was provided. If the processing fails, adds the message
-     * to a retry buffer, to be retried later.
+     * Calls the given callback for the topic and event. If the
+     * processing fails, adds the message to a retry buffer,
+     * to be retried later.
      *
      * @param {Object} message Message consumed by the consumer.
      * @param {String} topic Topic where the message was consumed.
@@ -97,7 +113,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         const retryDelay = options.retryDelay === undefined ? this.retryDelay : options.retryDelay;
 
         try {
-            await this.topicCallbacks[topic](message, topic);
+            await this._callCallbacks(message, topic, options);
         } catch (err) {
             // if the message processing fails, the message is
             // added to a retry buffer that will retry in an
@@ -111,10 +127,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
                 retryDelay: retryDelay
             });
             await this._updateBufferFile();
-            return;
         }
-
-        if (options.onSuccess) options.onSuccess(message, topic);
     }
 
     /**
@@ -160,7 +173,13 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             if (Date.now() < message.lastRetry + message.retryDelay) continue;
 
             try {
-                await this.topicCallbacks[message.topic](message);
+                await this._callCallbacks(message, message.topic, options);
+
+                this.retryBuffer.splice(i, 1);
+                await this._updateBufferFile();
+                i--;
+
+                if (options.onSuccess) options.onSuccess(message, message.topic);
             } catch (err) {
                 // increases the delay time exponentially while
                 // decreasing the number of retries available
@@ -178,13 +197,36 @@ export class KafkaRetryConsumer extends KafkaConsumer {
                 await this._updateBufferFile();
                 continue;
             }
-
-            this.retryBuffer.splice(i, 1);
-            await this._updateBufferFile();
-            i--;
-
-            if (options.onSuccess) options.onSuccess(message, message.topic);
         }
+    }
+
+    /**
+     * Calls the given callback for the topic and event and sends
+     * a message confirming that the event was processed. The
+     * `onSuccess` logic can be outsourced if a function
+     * was provided.
+     *
+     * @param {Object} message Message consumed by the consumer.
+     * @param {String} topic Topic where the message was consumed.
+     * @param {Object} options Object that contains configuration
+     * variables and callback methods.
+     */
+    async _callCallbacks(message, topic, options) {
+        // retrieves all the callbacks for the provided: message, topic
+        // and event to be able to call them latter
+        const callbackPromises = Object.entries(this.topicCallbacks[topic])
+            .filter(([event, callback]) => event === message.name || event === "*")
+            .map(([event, callback]) => callback(message, topic));
+
+        // returns the control flow immediately in case there
+        // are no callbacks to be called, this ensures that the
+        // message is not marked as "consumed" as there were no
+        // valid callbacks called for it
+        if (callbackPromises.length === 0) return;
+
+        await Promise.all(callbackPromises);
+
+        if (options.onSuccess) options.onSuccess(message, topic);
     }
 
     /**
