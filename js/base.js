@@ -37,7 +37,7 @@ export class API {
      * going to be sent to.
      */
     async trigger(name, payload, options = {}) {
-        await this._ensureProducer();
+        await this._ensureProducer(options);
 
         const event = {
             name: name,
