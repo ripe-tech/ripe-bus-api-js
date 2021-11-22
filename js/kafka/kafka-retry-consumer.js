@@ -246,12 +246,10 @@ export class KafkaRetryConsumer extends KafkaConsumer {
 
         // if the file exists, reads it and populates
         // the retryBuffer, if not ignores and returns
-        try {
-            const data = await fs.promises.readFile(`${this.retryPersistenceDir}/retry.json`, {
-                encoding: "utf-8"
-            });
-            this.retryBuffer = JSON.parse(data);
-        } catch {}
+        const data = await fs.promises.readFile(`${this.retryPersistenceDir}/retry.json`, {
+            encoding: "utf-8"
+        });
+        this.retryBuffer = JSON.parse(data);
     }
 
     /**
