@@ -24,6 +24,8 @@ export type BindOptions = {
     events?: string | string[],
     autoConfirm?: boolean,
     run?: boolean,
+    block?: boolean,
+    override?: boolean,
     callback?: ConsumerCallback,
     onSuccess?: ConsumerCallback,
     onError?: ConsumerCallback
@@ -37,7 +39,5 @@ export declare class API {
     bind(topic: string, options?: ConsumerCallback | BindOptions): Promise<void>;
     topics(): Promise<string[]>;
     build(): Promise<void>;
-    runConsumer(messageProcessor: Function, sendConfirmation?: Function, sendError?: Function): Promise<object>;
-    sendMessages(messages: string[] | object[], topic?: string): Promise<object>;
     destroy(): Promise<void>;
 }
