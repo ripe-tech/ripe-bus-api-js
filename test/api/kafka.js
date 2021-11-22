@@ -75,6 +75,7 @@ describe("Kafka", function() {
             const fakeConsumer = {
                 connect: () => {},
                 subscribe: () => {},
+                disconnect: () => {},
                 run: ({ eachBatch }) => {
                     eachBatch({
                         batch: { topic: "test-topic", messages: messages },
@@ -115,6 +116,7 @@ describe("Kafka", function() {
                 true
             );
 
+            await bus.destroy();
             clientStub.restore();
         });
 
@@ -124,6 +126,7 @@ describe("Kafka", function() {
             const fakeConsumer = {
                 connect: () => {},
                 subscribe: () => {},
+                disconnect: () => {},
                 run: () => {}
             };
             const connectSpy = sinon.spy(fakeConsumer, "connect");
@@ -146,6 +149,7 @@ describe("Kafka", function() {
             assert.strictEqual(subscribeSpy.calledWithExactly({ topic: "test-topic" }), true);
             assert.strictEqual(runSpy.called, true);
 
+            await bus.destroy();
             clientStub.restore();
         });
 
@@ -156,6 +160,7 @@ describe("Kafka", function() {
             const fakeConsumer = {
                 connect: () => {},
                 subscribe: () => {},
+                disconnect: () => {},
                 run: ({ eachBatch }) => {
                     eachBatch({
                         batch: { topic: "test-topic", messages: messages },
@@ -200,7 +205,7 @@ describe("Kafka", function() {
                 true
             );
 
-            await fs.promises.unlink("data/retry.json");
+            await Promise.all([bus.destroy(), fs.promises.unlink("data/retry.json")]);
             clientStub.restore();
         });
     });
