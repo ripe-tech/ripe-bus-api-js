@@ -219,7 +219,7 @@ export class KafkaConsumer extends Consumer {
         // retrieves all the callbacks for the provided: message, topic
         // and event to be able to call them latter
         const callbackPromises = Object.entries(this.topicCallbacks[topic])
-                .filter(([event, callback]) => event === message.name || event === "*")
+            .filter(([event, callback]) => event === message.name || event === "*")
             .map(([event, callback]) => callback(message, topic));
 
         // returns the control flow immediately in case there
