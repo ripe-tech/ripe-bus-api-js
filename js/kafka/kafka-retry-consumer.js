@@ -9,12 +9,15 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         await super.init(options);
 
         this.retries = conf("KAFKA_CONSUMER_MESSAGE_FAILURE_RETRIES", 5);
+        this.retryInterval = conf("KAFKA_CONSUMER_MESSAGE_RETRY_INTERVAL", 1000);
         this.retryDelay = conf("KAFKA_CONSUMER_MESSAGE_FIRST_DELAY", 50);
         this.messageFailureMaxTime = conf("KAFKA_CONSUMER_MESSAGE_FAILURE_MAX_TIME", null);
         this.messageDelayExponential = conf("KAFKA_CONSUMER_MESSAGE_DELAY_EXPONENTIAL", 2);
         this.retryPersistenceDir = conf("KAFKA_CONSUMER_RETRY_PERSISTENCE_DIR", "data");
 
         this.retries = options.retries === undefined ? this.retries : options.retries;
+        this.retryInterval =
+            options.retryInterval === undefined ? this.retryInterval : options.retryInterval;
         this.retryDelay = options.retryDelay === undefined ? this.retryDelay : options.retryDelay;
         this.messageFailureMaxTime =
             options.messageFailureMaxTime === undefined
@@ -66,8 +69,9 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         );
         topics.forEach(topic => (this.topicCallbacks[topic] = options.callback));
 
-        // retries processing previously failed messages every second
-        setInterval(() => this._retry(options), 1000);
+        // retries processing previously failed messages every
+        // retry interval
+        setInterval(() => this._retry(options), this.retryInterval);
 
         // run the consumer only if the flag is true, making it
         // possible to subscribe to several topics first and
