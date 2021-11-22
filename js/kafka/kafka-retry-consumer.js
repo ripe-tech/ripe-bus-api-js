@@ -36,6 +36,11 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         this._readFromBufferFile();
     }
 
+    async disconnect() {
+        await super.disconnect();
+        clearInterval(this.retryIntervalId);
+    }
+
     /**
      * Subscribes the consumer to the given topic and
      * starts consuming if the `run` flag is set.
@@ -71,7 +76,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
 
         // retries processing previously failed messages every
         // retry interval
-        setInterval(() => this._retry(options), this.retryInterval);
+        this.retryIntervalId = setInterval(() => this._retry(options), this.retryInterval);
 
         // run the consumer only if the flag is true, making it
         // possible to subscribe to several topics first and
