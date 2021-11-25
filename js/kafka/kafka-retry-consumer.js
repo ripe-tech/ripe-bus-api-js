@@ -65,6 +65,8 @@ export class KafkaRetryConsumer extends KafkaConsumer {
             topics.map(async topic => await this.consumer.subscribe({ topic: topic }))
         );
 
+        // normalizes the events value as a sequence making sure that if a basic
+        // type is provided it's encapsulated as an array
         const events =
             options.events === undefined
                 ? null
@@ -224,8 +226,12 @@ export class KafkaRetryConsumer extends KafkaConsumer {
         // valid callbacks called for it
         if (callbackPromises.length === 0) return;
 
+        // waits for all the callback promises to be fulfilled
+        // (keep in mind that execution is done in parallel)
         await Promise.all(callbackPromises);
 
+        // in case an on success callback is defined in the options
+        // object then such callback is called
         if (options.onSuccess) options.onSuccess(message, topic);
     }
 
