@@ -37,7 +37,7 @@ export class API {
      * going to be sent to.
      */
     async trigger(name, payload, options = {}) {
-        await this._ensureProducer();
+        await this._ensureProducer(options);
 
         const event = {
             name: name,
@@ -97,7 +97,7 @@ export class API {
 
         // makes sure that there's a valid consumer instance that is
         // connected to the proper remote provider
-        await this._ensureConsumer();
+        await this._ensureConsumer(options);
 
         // start the consuming process for the requested topic
         // this may block the current execution into an event loop
@@ -119,33 +119,33 @@ export class API {
         return this.busAdapter[0].toUpperCase() + this.busAdapter.slice(1);
     }
 
-    async _getProducer() {
-        await this._ensureProducer();
+    async _getProducer(options = {}) {
+        await this._ensureProducer(options);
         return this.producer;
     }
 
-    async _getConsumer() {
-        await this._ensureConsumer();
+    async _getConsumer(options = {}) {
+        await this._ensureConsumer(options);
         return this.consumer;
     }
 
-    async _ensureProducer() {
+    async _ensureProducer(options = {}) {
         if (this.producer) return;
-        await this._buildProducer();
+        await this._buildProducer(options);
     }
 
-    async _ensureConsumer() {
+    async _ensureConsumer(options = {}) {
         if (this.consumer) return;
-        await this._buildConsumer();
+        await this._buildConsumer(options);
     }
 
-    async _buildProducer() {
-        this.producer = await adapters[this.adapter + "Producer"].build(this);
+    async _buildProducer(options = {}) {
+        this.producer = await adapters[this.adapter + "Producer"].build(this, options);
         await this.producer.connect();
     }
 
-    async _buildConsumer() {
-        this.consumer = await adapters[this.adapter + "Consumer"].build(this);
+    async _buildConsumer(options = {}) {
+        this.consumer = await adapters[this.adapter + "Consumer"].build(this, options);
         await this.consumer.connect();
     }
 }
