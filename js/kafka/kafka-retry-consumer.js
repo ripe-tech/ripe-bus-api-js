@@ -38,7 +38,7 @@ export class KafkaRetryConsumer extends KafkaConsumer {
 
     async disconnect() {
         await super.disconnect();
-        clearInterval(this.retryIntervalId);
+        if (this.retryIntervalId) clearInterval(this.retryIntervalId);
     }
 
     /**
