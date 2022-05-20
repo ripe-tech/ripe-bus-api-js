@@ -11,6 +11,7 @@ export class KafkaProducer extends Producer {
     }
 
     async init(options = {}) {
+        this.globalDiffusion = conf("GLOBAL_DIFFUSION", true);
         this.metadataMaxAge = conf("KAFKA_PRODUCER_METADATA_MAX_AGE", 300000);
         this.allowAutoTopicCreation = conf("KAFKA_PRODUCER_AUTO_TOPIC_CREATION", true);
         this.transactionTimeout = conf("KAFKA_PRODUCER_TRANSACTION_TIMEOUT", 60000);
@@ -18,8 +19,9 @@ export class KafkaProducer extends Producer {
         this.timeout = conf("KAFKA_PRODUCER_TIMEOUT", 30000);
         this.compression = conf("KAFKA_PRODUCER_COMPRESSION", null);
         this.maxInFlightRequests = conf("KAFKA_PRODUCER_MAX_INFLIGHT_REQUESTS", null);
-        this.globalDiffusion = conf("KAFKA_GLOBAL_DIFFUSION", true);
 
+        this.globalDiffusion =
+            options.globalDiffusion === undefined ? this.globalDiffusion : options.globalDiffusion;
         this.metadataMaxAge =
             options.producerMetadataMaxAge === undefined
                 ? this.metadataMaxAge
@@ -43,8 +45,6 @@ export class KafkaProducer extends Producer {
             options.maxInFlightRequests === undefined
                 ? this.maxInFlightRequests
                 : options.producerMaxInFlightRequests;
-        this.globalDiffusion =
-            options.globalDiffusion === undefined ? this.globalDiffusion : options.globalDiffusion;
 
         const kafkaClient = await KafkaClient.getInstance(options);
         this.producer = kafkaClient.client.producer({
@@ -84,11 +84,6 @@ export class KafkaProducer extends Producer {
             ),
             messages: this._serializeMessage(message)
         });
-
-        const globalDiffusion =
-            options.globalDiffusion === undefined ? this.globalDiffusion : options.globalDiffusion;
-        const globalTopic = KafkaClient.getGlobalTopic(topic);
-        if (globalDiffusion && globalTopic) await this.produce(globalTopic, message, options);
     }
 
     /**

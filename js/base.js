@@ -51,6 +51,13 @@ export class API {
         const topic = options.topic || name.split(".", 1)[0];
 
         await this.producer.produce(topic, event, options);
+
+        const globalDiffusion =
+            options.globalDiffusion === undefined
+                ? this.producer.globalDiffusion
+                : options.globalDiffusion;
+        const globalTopic = this._getGlobalTopic(topic);
+        if (globalDiffusion && globalTopic) await this.trigger(globalTopic, event, options);
     }
 
     /**
@@ -147,6 +154,19 @@ export class API {
     async _buildConsumer(options = {}) {
         this.consumer = await adapters[this.adapter + "Consumer"].build(this, options);
         await this.consumer.connect();
+    }
+
+    /**
+     * Parses a topic name to extract the global topic.
+     * For example, the global topic of "global:subdomain-123"
+     * is "global".
+     *
+     * @param {String} topic The name of the topic to be parse.
+     * @returns {String} The global topic name.
+     */
+    _getGlobalTopic(topic, separator = ":") {
+        if (!topic.includes(separator)) return;
+        return topic.substring(0, topic.lastIndexOf(separator));
     }
 }
 
