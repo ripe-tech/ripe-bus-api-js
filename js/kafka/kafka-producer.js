@@ -18,6 +18,7 @@ export class KafkaProducer extends Producer {
         this.timeout = conf("KAFKA_PRODUCER_TIMEOUT", 30000);
         this.compression = conf("KAFKA_PRODUCER_COMPRESSION", null);
         this.maxInFlightRequests = conf("KAFKA_PRODUCER_MAX_INFLIGHT_REQUESTS", null);
+        this.globalDiffusion = conf("KAFKA_GLOBAL_DIFFUSION", true);
 
         this.metadataMaxAge =
             options.producerMetadataMaxAge === undefined
@@ -42,6 +43,8 @@ export class KafkaProducer extends Producer {
             options.maxInFlightRequests === undefined
                 ? this.maxInFlightRequests
                 : options.producerMaxInFlightRequests;
+        this.globalDiffusion =
+            options.globalDiffusion === undefined ? this.globalDiffusion : options.globalDiffusion;
 
         const kafkaClient = await KafkaClient.getInstance(options);
         this.producer = kafkaClient.client.producer({
@@ -62,11 +65,12 @@ export class KafkaProducer extends Producer {
 
     /**
      * Converts messages to an array of strings and sends
-     * it to a specified topic.
+     * it to a specified topic and the global topics when
+     * using global diffusion.
      *
      * @param {String} topic Topic to send messages to.
      * @param {Array|Object|String} message Message or messages
-     * to be sent to a topic.
+     * to be sent.
      * @param {Object} options Object that includes configuration
      * variables.
      */
@@ -80,6 +84,11 @@ export class KafkaProducer extends Producer {
             ),
             messages: this._serializeMessage(message)
         });
+
+        const globalDiffusion =
+            options.globalDiffusion === undefined ? this.globalDiffusion : options.globalDiffusion;
+        const globalTopic = KafkaClient.getGlobalTopic(topic);
+        if (globalDiffusion && globalTopic) await this.produce(globalTopic, message, options);
     }
 
     /**

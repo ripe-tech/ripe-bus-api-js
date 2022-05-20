@@ -38,6 +38,17 @@ export class KafkaClient extends Client {
         return topic.replace(illegalChars, "-");
     }
 
+    /**
+     * Decomposes a topic name to extract it's global topic name.
+     *
+     * @param {String} topic The name of the topic to be decomposed.
+     * @returns {String} The global topic name.
+     */
+    static getGlobalTopic(topic) {
+        if (!topic.includes(":")) return;
+        return topic.substring(0, topic.lastIndexOf(":"));
+    }
+
     async init(options = {}) {
         let hosts = conf("KAFKA_HOSTS", "localhost:9092");
         let clientId = conf("KAFKA_CLIENT_ID", "ripe-kafka");
