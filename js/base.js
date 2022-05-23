@@ -56,7 +56,7 @@ export class API {
             options.globalDiffusion === undefined
                 ? this.producer.globalDiffusion
                 : options.globalDiffusion;
-        const globalTopic = this._getGlobalTopic(topic);
+        const globalTopic = this._globalTopic(topic);
         if (globalDiffusion && globalTopic) await this.trigger(globalTopic, event, options);
     }
 
@@ -164,7 +164,7 @@ export class API {
      * @param {String} topic The name of the topic to be parse.
      * @returns {String} The global topic name.
      */
-    _getGlobalTopic(topic, separator = ":") {
+    _globalTopic(topic, separator = ":") {
         if (!topic.includes(separator)) return;
         return topic.substring(0, topic.lastIndexOf(separator));
     }
