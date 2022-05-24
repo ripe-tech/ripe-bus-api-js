@@ -57,7 +57,7 @@ export class API {
                 ? this.producer.globalDiffusion
                 : options.globalDiffusion;
         const globalTopic = this._globalTopic(topic);
-        if (globalDiffusion && globalTopic) await this.trigger(globalTopic, event, options);
+        if (globalDiffusion && globalTopic) await this.trigger(globalTopic, payload, options);
     }
 
     /**
