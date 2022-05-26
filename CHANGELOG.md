@@ -14,11 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-*
+* Bump dependencies
 
 ### Fixed
 
-*
+* Fix eslint dependencies problems
 
 ## [0.5.0] - 2021-11-22
 
