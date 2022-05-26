@@ -34,9 +34,15 @@ describe("Kafka", function() {
         it("should be able to trigger a message in the adapter for topics with global diffusion", async () => {
             const bus = new api.API({ hosts: "localhost:9092", adapter: "kafka" });
 
+            const sentMessages = {};
             const fakeProducer = {
                 connect: () => {},
-                send: () => {}
+                send: ({ topic, messages }) => {
+                    sentMessages[topic] = [
+                        ...(sentMessages[topic] || []),
+                        ...messages.map(m => m.value)
+                    ];
+                }
             };
             const connectSpy = sinon.spy(fakeProducer, "connect");
             const sendSpy = sinon.spy(fakeProducer, "send");
@@ -55,6 +61,12 @@ describe("Kafka", function() {
 
             assert.strictEqual(connectSpy.calledOnce, true);
             assert.strictEqual(sendSpy.callCount, 3);
+            assert.strictEqual(Object.keys(sentMessages).includes("namespace1"), true);
+            assert.strictEqual(Object.keys(sentMessages).includes("namespace1-namespace2"), true);
+            assert.strictEqual(
+                Object.keys(sentMessages).includes("namespace1-namespace2-test-topic"),
+                true
+            );
 
             clientStub.restore();
         });
