@@ -31,6 +31,7 @@ describe("Kafka", function() {
 
             clientStub.restore();
         });
+
         it("should be able to trigger a message in the adapter for topics with global diffusion", async () => {
             const bus = new api.API({ hosts: "localhost:9092", adapter: "kafka" });
 
