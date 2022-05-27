@@ -65,7 +65,7 @@ export class KafkaProducer extends Producer {
 
     /**
      * Converts messages to an array of strings and sends
-     * it to a specified topic and the global topics when
+     * it to a specified topic and the global topic when
      * using global diffusion.
      *
      * @param {String} topic Topic to send messages to.

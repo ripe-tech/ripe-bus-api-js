@@ -161,7 +161,7 @@ export class API {
      * For example, the global topic of "global:subdomain-123"
      * is "global".
      *
-     * @param {String} topic The name of the topic to be parse.
+     * @param {String} topic The name of the topic to be parsed.
      * @returns {String} The global topic name.
      */
     _globalTopic(topic, separator = ":") {
