@@ -11,6 +11,7 @@ export class KafkaProducer extends Producer {
     }
 
     async init(options = {}) {
+        this.globalDiffusion = conf("GLOBAL_DIFFUSION", true);
         this.metadataMaxAge = conf("KAFKA_PRODUCER_METADATA_MAX_AGE", 300000);
         this.allowAutoTopicCreation = conf("KAFKA_PRODUCER_AUTO_TOPIC_CREATION", true);
         this.transactionTimeout = conf("KAFKA_PRODUCER_TRANSACTION_TIMEOUT", 60000);
@@ -19,6 +20,8 @@ export class KafkaProducer extends Producer {
         this.compression = conf("KAFKA_PRODUCER_COMPRESSION", null);
         this.maxInFlightRequests = conf("KAFKA_PRODUCER_MAX_INFLIGHT_REQUESTS", null);
 
+        this.globalDiffusion =
+            options.globalDiffusion === undefined ? this.globalDiffusion : options.globalDiffusion;
         this.metadataMaxAge =
             options.producerMetadataMaxAge === undefined
                 ? this.metadataMaxAge
@@ -62,11 +65,12 @@ export class KafkaProducer extends Producer {
 
     /**
      * Converts messages to an array of strings and sends
-     * it to a specified topic.
+     * it to a specified topic and the global topic when
+     * using global diffusion.
      *
      * @param {String} topic Topic to send messages to.
      * @param {Array|Object|String} message Message or messages
-     * to be sent to a topic.
+     * to be sent.
      * @param {Object} options Object that includes configuration
      * variables.
      */

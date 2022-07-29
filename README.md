@@ -51,6 +51,7 @@ bus.trigger("order.created", { id: 1, ... }, {
 | `datatype`                   | `str`  | `json`                  | `all`   | Datatype of the payload message.                                                                                                                      |
 | `timestamp`                  | `str`  | `Date.now()`            | `all`   | Timestamp of the message creation.                                                                                                                    |
 | `topic`                      | `str`  | `name.split(".", 1)[0]` | `all`   | The topic to which the message will be sent. If no topic is provided, it defaults to the first part of the string (split by `.`).                     |
+| `globalDiffusion`            | `bool` | `true`                  | `all`   | Enables the global diffusion of topics.                                                                                                               |
 | `producerMetadataMaxAge`     | `int`  | `300000`                | `kafka` | Period of time in milliseconds in which a force refresh of the metadata is made if no partition leadership changes are made.                          |
 | `producerAutoTopicCreation`  | `bool` | `true`                  | `kafka` | Enables topic creation when if topic did not exist previously before sending the message.                                                             |
 | `producerTransactionTimeout` | `int`  | `60000`                 | `kafka` | The maximum amount of time in milliseconds it waits for a delivery status updated from the producer before aborting the process.                      |
@@ -117,9 +118,10 @@ bus.bind(["order", "ripe_twitch:order"], message => { ... });
 
 ### Global
 
-| Name                                                | Type   | Default            | Description                                                                                                                                                                                                           |
-| --------------------------------------------------- | ------ | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **BUS_ADAPTER**                                     | `str`  | `kafka`            | The name of the bus adapter adapter to be used (eg: `kafka`, `kafkaRetry`).                                                                                                                                           |
+| Name                 | Type   | Default | Description                                                                 |
+| -------------------- | ------ | ------- | --------------------------------------------------------------------------- |
+| **BUS_ADAPTER**      | `str`  | `kafka` | The name of the bus adapter adapter to be used (eg: `kafka`, `kafkaRetry`). |
+| **GLOBAL_DIFFUSION** | `bool` | `true`  | Enables the global diffusion of topics.                                     |
 ### Kafka
 
 | Name                                                | Type   | Default            | Description                                                                                                                                                                                                           |
