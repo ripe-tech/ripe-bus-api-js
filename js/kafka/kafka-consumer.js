@@ -193,9 +193,18 @@ export class KafkaConsumer extends Consumer {
                         // the provided set of options
                         await this._processMessage(messageD, batch.topic, options);
                     } catch (err) {
-                        console.trace(
-                            `Problem handling message (offset=${message.offset}, timestamp=${message.timestamp}) in topic '${batch.topic}': ${err}`
+                        console.error(
+                            `Problem handling message (offset=${message.offset}, timestamp=${message.timestamp}) in topic '${batch.topic}'`
                         );
+                        console.error(`Error name: ${err.name}`);
+                        console.error(`Error message: ${err.message}`);
+                        if (err.stack) {
+                            console.error(`Error stack:\n${err.stack}`);
+                        }
+                        if (err.code) {
+                            console.error(`Error code: ${err.code}`);
+                        }
+                        console.trace("Call stack:");
                     } finally {
                         await heartbeat();
                     }
